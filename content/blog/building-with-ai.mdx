@@ -1,0 +1,40 @@
+---
+title: "Building a Portfolio Site with Claude in One Session"
+description: "What it's actually like to build a full website by prompting an AI — what worked, what didn't, and whether I'd do it again."
+date: "2026-04-10"
+tags: ["ai", "tooling", "next.js"]
+---
+
+I just built this entire portfolio and blog in a single session with Claude. Here's an honest look at how that went.
+
+## The setup
+
+I started with a clear idea of what I wanted:
+
+- A modern React-based portfolio with Next.js
+- Clean, minimal design with dark mode
+- A blog powered by MDX files
+- Static export for GitHub Pages deployment
+- Smooth animations that don't feel gimmicky
+
+Instead of starting from a template, I described the stack and let Claude scaffold it from scratch — `create-next-app`, then layering on shadcn/ui, Framer Motion, and MDX tooling.
+
+## What worked well
+
+**Component generation was fast.** Describing a nav bar with "sticky, blurred background, animated active indicator, mobile hamburger menu" produced something polished on the first try. The combination of Tailwind and shadcn/ui is particularly well-suited to AI-assisted development because the utility classes are descriptive and composable.
+
+**The blog system came together quickly.** Reading MDX files from the filesystem, parsing frontmatter with gray-matter, computing reading time — this is well-trodden territory and Claude handled it without issues.
+
+**Animations were surprisingly good.** Framer Motion's declarative API means you can describe the *behavior* you want ("fade in from below, stagger the children") rather than the implementation, which maps naturally to how you'd prompt an AI.
+
+## What needed iteration
+
+**Design taste is subjective.** The initial output was *correct* but needed refinement — spacing, font sizes, the exact feel of hover states. This is where human judgment matters most. AI can give you a solid 80%, but the last 20% is taste.
+
+**Static export constraints.** A few things needed to be caught and adjusted for `output: 'export'` — like `images: { unoptimized: true }` and making sure all dynamic routes had `generateStaticParams`.
+
+## Would I do it again?
+
+Absolutely. The key insight is that AI doesn't replace your engineering judgment — it accelerates the mechanical parts so you can spend more time on the decisions that actually matter: what to build, how it should feel, and whether it's solving the right problem.
+
+The code is all yours to modify. That's the beauty of scaffolding with AI — you end up with a real codebase, not a black box.
