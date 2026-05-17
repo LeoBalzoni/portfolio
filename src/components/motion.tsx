@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 export function FadeIn({
   children,
@@ -11,11 +11,14 @@ export function FadeIn({
   delay?: number;
   className?: string;
 }) {
+  const reduced = useReducedMotion() ?? false;
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={reduced ? false : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      transition={
+        reduced ? { duration: 0 } : { duration: 0.5, delay, ease: "easeOut" }
+      }
       className={className}
     >
       {children}
@@ -32,12 +35,15 @@ export function ScrollFadeIn({
   delay?: number;
   className?: string;
 }) {
+  const reduced = useReducedMotion() ?? false;
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={reduced ? false : { opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, delay, ease: "easeOut" }}
+      transition={
+        reduced ? { duration: 0 } : { duration: 0.6, delay, ease: "easeOut" }
+      }
       className={className}
     >
       {children}
@@ -52,14 +58,15 @@ export function ScrollStagger({
   children: React.ReactNode;
   className?: string;
 }) {
+  const reduced = useReducedMotion() ?? false;
   return (
     <motion.div
-      initial="hidden"
+      initial={reduced ? false : "hidden"}
       whileInView="visible"
       viewport={{ once: true, margin: "-50px" }}
       variants={{
         hidden: {},
-        visible: { transition: { staggerChildren: 0.1 } },
+        visible: { transition: { staggerChildren: reduced ? 0 : 0.1 } },
       }}
       className={className}
     >
@@ -75,11 +82,16 @@ export function ScrollStaggerItem({
   children: React.ReactNode;
   className?: string;
 }) {
+  const reduced = useReducedMotion() ?? false;
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+        hidden: reduced ? {} : { opacity: 0, y: 20 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: reduced ? 0 : 0.5 },
+        },
       }}
       className={className}
     >
@@ -95,13 +107,14 @@ export function FadeInStagger({
   children: React.ReactNode;
   className?: string;
 }) {
+  const reduced = useReducedMotion() ?? false;
   return (
     <motion.div
-      initial="hidden"
+      initial={reduced ? false : "hidden"}
       animate="visible"
       variants={{
         hidden: {},
-        visible: { transition: { staggerChildren: 0.1 } },
+        visible: { transition: { staggerChildren: reduced ? 0 : 0.1 } },
       }}
       className={className}
     >
@@ -117,11 +130,16 @@ export function FadeInItem({
   children: React.ReactNode;
   className?: string;
 }) {
+  const reduced = useReducedMotion() ?? false;
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+        hidden: reduced ? {} : { opacity: 0, y: 20 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: reduced ? 0 : 0.5 },
+        },
       }}
       className={className}
     >
@@ -137,10 +155,11 @@ export function ScaleOnHover({
   children: React.ReactNode;
   className?: string;
 }) {
+  const reduced = useReducedMotion() ?? false;
   return (
     <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={reduced ? undefined : { scale: 1.02 }}
+      whileTap={reduced ? undefined : { scale: 0.98 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className={className}
     >

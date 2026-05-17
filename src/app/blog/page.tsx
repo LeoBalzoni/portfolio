@@ -26,11 +26,11 @@ export default function BlogPage() {
           <p className="text-muted-foreground">No posts yet. Check back soon.</p>
         </FadeIn>
       ) : (
-        <FadeInStagger className="mt-12 flex flex-col gap-1">
+        <FadeInStagger className="mt-12 flex flex-col gap-2">
           {posts.map((post) => (
             <FadeInItem key={post.slug}>
               <Link href={`/blog/${post.slug}/`}>
-                <article className="group rounded-lg border border-transparent px-4 py-5 transition-colors hover:border-border hover:bg-muted/50">
+                <article className="group rounded-lg border border-border/70 px-4 py-5 transition-colors hover:border-border hover:bg-muted/50">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0 flex-1">
                       <h2 className="text-lg font-medium group-hover:text-foreground">

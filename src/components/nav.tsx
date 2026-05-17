@@ -85,7 +85,7 @@ export function Nav() {
                   {isActive && (
                     <motion.div
                       layoutId="nav-indicator"
-                      className="absolute inset-x-1 -bottom-[1.1rem] h-px bg-foreground"
+                      className="absolute inset-x-1 -bottom-[1.1rem] h-px bg-primary"
                       transition={{ type: "spring", stiffness: 350, damping: 30 }}
                     />
                   )}
@@ -140,7 +140,7 @@ export function Nav() {
                       onClick={() => scrollTo(id)}
                       className={`rounded-md px-3 py-2 text-left text-sm font-medium transition-colors ${
                         isActive
-                          ? "bg-muted text-foreground"
+                          ? "bg-primary/10 text-primary"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     >

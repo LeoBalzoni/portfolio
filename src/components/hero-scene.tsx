@@ -3,17 +3,20 @@
 import { Suspense, useRef, useEffect, useState, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF, Float, Environment } from "@react-three/drei";
+import { useReducedMotion } from "framer-motion";
 import * as THREE from "three";
 
-const MODEL_PATH = "/models/davinci-bust.glb";
+// useGLTF/Suspense call fetch() with this literal — Next's basePath isn't
+// applied automatically, so we mirror the next.config.ts logic here.
+const BASE_PATH = process.env.NODE_ENV === "production" ? "/portfolio" : "";
+const MODEL_PATH = `${BASE_PATH}/models/davinci-bust.glb`;
 
-function DaVinciBust() {
+function DaVinciBust({ reducedMotion }: { reducedMotion: boolean }) {
   const { scene } = useGLTF(MODEL_PATH);
   const groupRef = useRef<THREE.Group>(null);
   const baseRotation = useRef(0);
   const mouse = useRef({ x: 0, y: 0 });
 
-  // Clone, center, and normalize scale so the model fits in a ~2-unit sphere
   const normalizedScene = useMemo(() => {
     const clone = scene.clone();
     const box = new THREE.Box3().setFromObject(clone);
@@ -29,21 +32,24 @@ function DaVinciBust() {
   }, [scene]);
 
   useEffect(() => {
+    if (reducedMotion) return;
     function handleMouseMove(e: MouseEvent) {
       mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
     }
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  }, [reducedMotion]);
 
   useFrame((_state, delta) => {
-    if (!groupRef.current) return;
+    if (!groupRef.current || reducedMotion) return;
 
-    // Slow auto-rotation on Y
-    baseRotation.current += delta * 0.15;
+    // Clamp delta — when frameloop pauses on scroll-out, Three's clock keeps
+    // accumulating, and the first frame after resume hands us a huge delta
+    // that would spike the rotation target.
+    const dt = Math.min(delta, 0.05);
+    baseRotation.current += dt * 0.15;
 
-    // Mouse offset: subtle ±15 degrees (0.26 rad)
     const mouseOffsetY = mouse.current.x * 0.26;
     const mouseOffsetX = mouse.current.y * 0.15;
 
@@ -59,11 +65,17 @@ function DaVinciBust() {
     );
   });
 
+  const bust = (
+    <group ref={groupRef}>
+      <primitive object={normalizedScene} />
+    </group>
+  );
+
+  if (reducedMotion) return bust;
+
   return (
     <Float speed={1.5} rotationIntensity={0.1} floatIntensity={0.3}>
-      <group ref={groupRef}>
-        <primitive object={normalizedScene} />
-      </group>
+      {bust}
     </Float>
   );
 }
@@ -89,6 +101,7 @@ function SceneLighting() {
 export function HeroScene() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [opacity, setOpacity] = useState(1);
+  const reducedMotion = useReducedMotion() ?? false;
 
   useEffect(() => {
     function handleScroll() {
@@ -101,6 +114,13 @@ export function HeroScene() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const visible = opacity > 0;
+  const frameloop: "always" | "demand" | "never" = !visible
+    ? "never"
+    : reducedMotion
+      ? "demand"
+      : "always";
+
   return (
     <div
       ref={containerRef}
@@ -111,18 +131,18 @@ export function HeroScene() {
         camera={{ position: [0, 0, 4], fov: 45 }}
         style={{ pointerEvents: "auto" }}
         gl={{ antialias: true, alpha: true }}
+        frameloop={frameloop}
       >
         <Suspense fallback={null}>
           <SceneLighting />
-          <DaVinciBust />
+          <DaVinciBust reducedMotion={reducedMotion} />
         </Suspense>
       </Canvas>
-      <p className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap font-heading text-sm italic text-muted-foreground">
+      <p className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap font-heading text-sm italic text-primary/70">
         Not this Leonardo.
       </p>
     </div>
   );
 }
 
-// Preload model
 useGLTF.preload(MODEL_PATH);
