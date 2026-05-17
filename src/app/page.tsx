@@ -64,7 +64,7 @@ export default function Home() {
               </p>
             </FadeIn>
             <FadeIn delay={0.1}>
-              <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-7xl md:text-6xl">
+              <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl">
                 Leonardo
                 <br />
                 <span>Balzoni</span>
