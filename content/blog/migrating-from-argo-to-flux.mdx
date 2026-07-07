@@ -1,0 +1,44 @@
+---
+title: "Migrating from ArgoCD to Flux"
+description: "We moved a Kubernetes-based platform team from ArgoCD to FluxCD and took CI/CD all the way to production. Notes on what we found along the way."
+date: "2026-04-12"
+tags: ["kubernetes", "gitops", "flux", "infrastructure"]
+---
+
+For a while my team's CI/CD story was a polite fiction. Dev deploys went through ArgoCD. Production deploys went through the central monolith release train, which meant we couldn't ship a hotfix without dragging the whole platform with us. Eventually we decided to migrate to FluxCD and take our own deploys all the way to prod. This post is what I'd tell another team about to do the same.
+
+## Why we moved
+
+The honest answer wasn't "Flux is better than Argo." Both work. The reason was that we wanted to be on the same GitOps tooling the rest of the org was standardizing on, so our delivery model could match everyone else's. Coupling that with the work of escaping the monolith release process made it a single, big-but-coherent migration instead of two smaller ones.
+
+If you're considering this, the question to answer first isn't "which tool" — it's "what does the *end state* of our delivery pipeline look like." Once you know that, the tooling choice gets a lot easier.
+
+## What "fully on Flux" actually means
+
+The thing nobody tells you about a GitOps migration is that the day you stop running the old tool isn't the day the migration is done. Production is where the real surprises live:
+
+- **Image promotion**: you need a story for how an image built in CI gets a green light to land in production. Flux Image Reflector + Image Update Automation works, but you have to decide policy: latest semver, latest tag matching a pattern, manual gate.
+- **Secrets**: dev environments often tolerate looser handling than prod. Sealed Secrets and external secrets operators behave differently enough at scale that you want to settle on one early.
+- **Drift**: anything you used to fix by clicking in Argo's UI you now need to fix in git. This is the whole point, but it changes muscle memory.
+
+We didn't get all of these right on the first pass. The migration was effectively done in dev for weeks before it was actually done in prod.
+
+## The unglamorous wins
+
+The thing I'm proudest of from this migration isn't the migration itself — it's the Confluence page. The first time we did a flotilla setup with Flux, I wrote down every step, every gotcha, every command that failed and what its real meaning was. The next time we did one, it took half as long. The time after that, someone else did it without me.
+
+Documentation written during the work, not after, is the only kind that actually helps. The "after" version is always cleaner and always omits the part where things broke.
+
+## Surprises
+
+A few things I didn't expect:
+
+- **Reconciliation timing matters more than I thought.** Flux's pull-based loop has a cadence; under load or with many sources, you can hit windows where what's in git and what's in the cluster diverge for longer than you'd like. Tune intervals deliberately.
+- **GitHub Actions ended up better than Jenkins for our delivery side.** We had to set up a new flotilla from scratch during the migration and ended up using GitHub Actions instead of Jenkins. It was less infra to babysit and the integration with the Flux side was cleaner.
+- **The hardest reviewers were our own pipelines.** Old assumptions baked into the deploy path — "this env var is always there," "this image tag follows this convention" — surfaced as weird Flux reconciliation errors. Fixing them was the right thing; finding them was tedious.
+
+## Was it worth it?
+
+Yes, but not for the reasons I expected. The biggest win wasn't speed or autonomy, though those are real. It was that the team's mental model of "how we deploy" became something we could explain in one diagram on a whiteboard, instead of a forty-minute story involving three teams and a Jenkins pipeline named after a person who left two years ago. That clarity pays for itself every time someone new joins.
+
+If you're sitting on a similar setup, my advice is: do the migration, but treat it as an excuse to redesign your delivery model end-to-end, not a like-for-like swap. The tool is just the vehicle.

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { HeroSceneLoader } from "@/components/hero-scene-loader";
 import { ArrowRight } from "lucide-react";
-import { GithubIcon, LinkedinIcon, XIcon } from "@/components/icons";
+import { GithubIcon, LinkedinIcon } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -24,19 +24,23 @@ const stack: { name: string; highlighted?: boolean }[] = [
   { name: "TypeScript", highlighted: true },
   { name: "React" },
   { name: "Next.js" },
-  { name: "Node.js" },
-  { name: "Go", highlighted: true },
-  { name: "Python" },
-  { name: "AWS" },
-  { name: "Kubernetes", highlighted: true },
-  { name: "Terraform" },
-  { name: "PostgreSQL" },
+  { name: "Python", highlighted: true },
+  { name: "Spark" },
+  { name: "Kafka" },
+  { name: "AWS", highlighted: true },
+  { name: "Kubernetes" },
+  { name: "GitOps / Flux" },
+  { name: "LLMs" },
+  { name: "SQL / NQL" },
 ];
 
 const socials = [
-  { href: "https://github.com", icon: GithubIcon, label: "GitHub" },
-  { href: "https://linkedin.com", icon: LinkedinIcon, label: "LinkedIn" },
-  { href: "https://x.com", icon: XIcon, label: "X" },
+  { href: "https://github.com/LeoBalzoni", icon: GithubIcon, label: "GitHub" },
+  {
+    href: "https://www.linkedin.com/in/leobalzoni/",
+    icon: LinkedinIcon,
+    label: "LinkedIn",
+  },
 ];
 
 function SectionEyebrow({ number, label }: { number: string; label: string }) {
@@ -72,9 +76,10 @@ export default function Home() {
             </FadeIn>
             <FadeIn delay={0.2}>
               <p className="mt-6 max-w-md text-lg text-muted-foreground">
-                Software engineer who enjoys building things that live on the
-                internet. Currently focused on cloud platforms, data systems, and
-                developer tooling.
+                Software engineer at Nexthink, based in Lausanne. I work on
+                cloud data platforms — architecture, pipelines, and the
+                infrastructure that ships them. Lately drawn to the messy
+                parts: untangling complexity, making slow things fast.
               </p>
             </FadeIn>
             <FadeIn delay={0.3} className="mt-8 flex items-center gap-4">
@@ -117,10 +122,24 @@ export default function Home() {
             About
           </h2>
           <p className="mt-4 max-w-2xl text-muted-foreground">
-            I like building software that&apos;s reliable, performant, and
-            pleasant to use. Most of my work involves cloud infrastructure,
-            backend systems, and developer-facing tools — but I enjoy the full
-            stack.
+            I work on Nexthink&apos;s Cloud Intelligence platform — the data
+            pipelines, event-driven systems, and Kubernetes infrastructure
+            behind the analytics our customers rely on. A lot of the work
+            today is large-scale and AI-assisted: LLM-driven pipelines running
+            on the AWS suite, Spark jobs feeding Kafka-backed DAGs, and the
+            dashboards (DEX Benchmarks, AppEx, Functional Errors) on top of
+            them. I started as an ML engineer in 2020 and have since drifted
+            toward architecture, backend systems, and the developer experience
+            around them.
+          </p>
+          <p className="mt-4 max-w-2xl text-muted-foreground">
+            I also wear a few non-IC hats: Scrum master for the team,
+            onboarding buddy for new hires, and the person who tends to end up
+            demoing to stakeholders. I like the parts where the work gets
+            ambiguous — shaping a feature before it&apos;s a ticket, profiling
+            something slow, unblocking another team — and the unglamorous
+            parts too, like the release cycle and the test suite that ships
+            with it.
           </p>
         </ScrollFadeIn>
         <ScrollFadeIn delay={0.1}>
@@ -253,8 +272,8 @@ export default function Home() {
             Get in touch
           </h2>
           <p className="mt-4 max-w-lg text-muted-foreground">
-            Want to work together or just say hi? Find me on any of these
-            platforms.
+            Want to chat about a project, an idea, or just say hi? GitHub and
+            LinkedIn are the fastest ways to reach me.
           </p>
         </ScrollFadeIn>
         <ScrollStagger className="mt-8 flex items-center gap-4">

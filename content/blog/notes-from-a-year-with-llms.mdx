@@ -1,0 +1,41 @@
+---
+title: "Notes from a Year of Building with LLMs"
+description: "A year ago I had never shipped anything LLM-shaped. Here's what I actually learned from doing it — minus the hype."
+date: "2026-05-05"
+tags: ["ai", "llms", "lessons"]
+---
+
+A year ago I had never shipped anything with an LLM in it. Then I got pulled into a customer pilot and had two weeks to learn enough to be useful. The demo worked, the customer was happy, and I ended up giving a company-wide talk about what I'd learned. This post is a slower version of that talk.
+
+## The hardest part isn't the model
+
+The model is the part that already works. By the time you've picked one, your real problems are everything around it: getting the right context in, parsing the output reliably, knowing when it's wrong, and handling the cases where it confidently isn't.
+
+Most of the time I spent on the pilot wasn't "prompt engineering" — it was data plumbing. Cleaning inputs. Deciding what to even ask. Figuring out which slice of the customer's data was small enough to fit in context but large enough to matter. The LLM call itself was usually a few lines.
+
+## Prompts are problem statements
+
+I used to think prompt engineering was a separate skill, like SQL or regex. After a year, I think it's mostly just defining the problem precisely — which is the same skill that makes you good at writing tickets, or briefing a junior, or designing an API.
+
+A vague prompt produces a vague answer. A prompt with the right examples, the right constraints, and a clear definition of "done" produces something usable. The model doesn't need cleverness; it needs specification.
+
+## Demos lie; pipelines tell the truth
+
+You can make almost anything look great in a demo. Cherry-pick three good cases, run them live, watch the room nod. That's not the bar.
+
+The bar is whether the same prompt works on a thousand inputs you haven't looked at, with the same quality, at a cost your finance team is fine with. The work that matters is building the eval harness, the cost budget, the fallback path when the model is unavailable, the retries when it returns invalid JSON. Without those, you don't have a feature — you have a demo.
+
+## Don't gatekeep
+
+The most useful thing I did wasn't the pilot itself. It was the talk afterward, where I tried to demystify what I'd done so other people on other teams would try it themselves. There's a tendency in this space to make it sound harder than it is, partly because the hype rewards mystique. It's not that hard. If you can describe a problem, parse a string, and write a retry, you can ship something useful.
+
+The biggest unlock at my company in the last year wasn't a model upgrade — it was more engineers feeling like this stuff was theirs to use.
+
+## What I'd tell past me
+
+- Don't read the papers first. Build the smallest possible thing, then read the papers when you hit something you don't understand.
+- Eval before you optimize. You can't tell if a prompt change helped if you don't have something to grade it against.
+- Pick boring infra. Your LLM call is the exciting part. Everything around it should be the same queues, databases, and observability you already use.
+- Watch costs from day one. It's easier to keep them low than to lower them later.
+
+A year in, I'm less mystified and more convinced this is just another tool — one with weird ergonomics, real costs, and surprising leverage when you treat it like a component rather than a magic box.

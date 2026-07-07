@@ -7,6 +7,6 @@ export const siteConfig = {
   name: "Leonardo Balzoni",
   title: "Leonardo Balzoni — Software Engineer",
   description:
-    "Software engineer building modern web applications. Writing about code, architecture, and engineering culture.",
+    "Software engineer at Nexthink in Lausanne. Working on large-scale, AI-assisted data platforms on AWS — Spark, Kafka, and the Kubernetes infrastructure that ships them. Writing occasionally about the work.",
   ogImageAlt: "Leonardo Balzoni — Software Engineer",
 };
