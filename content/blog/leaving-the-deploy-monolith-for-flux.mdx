@@ -1,0 +1,161 @@
+---
+title: "Leaving the deploy monolith for Flux"
+description: "For three years, shipping my team's services meant one-line pull requests to a repository shared with the whole company. This is how we moved to our own Flux flotilla, four small promotion PRs at a time."
+date: "2026-11-21"
+kind: "post"
+tags: ["kubernetes", "gitops", "flux", "helm", "delivery"]
+---
+
+For a while my team's delivery story was a polite fiction. Dev deploys went through ArgoCD. Production deploys went through the company's central release train, which meant we could not ship a hotfix without boarding it.
+
+This is the story of getting off that train and onto our own Flux setup, told from the pull requests.
+
+## Seventy-six one-line pull requests
+
+Production deployment lived in `sdlc.microservices-definition`, one repository shared by every team, with 249 service folders. Each folder held a `deploy.yaml` with a Helm chart version and a `values.yaml` with an image tag. A Jenkins job did the rest.
+
+Releasing a service meant changing two lines:
+
+```yaml
+# values.yaml
+tag: 2024.5.0        # was 2024.4.1
+
+# deploy.yaml
+chartVersion: 1.2.2  # was 1.2.1
+```
+
+Between December 2021 and December 2024 I merged 76 pull requests like that. In total they added 464 lines.
+
+The typical one was merged about four and a half hours after I opened it. One in ten took close to four days, and the slowest took almost eight. That is the time for a reviewed, approved, one-line change to become mergeable, on a branch that follows the monthly release.
+
+The titles tell the rest. Around 30 of the 76 are maintenance releases or fixes: "MR1", "MR2", "MR3", "on demand MR", "fix". On 18 July 2024 I opened "Cloud intelligence 2024.6.MR3" and, later the same day, "2024.6.MR3 fix". Five days after that came "Porting changes from on demand MR to 2024.7 release", which is the same change applied a second time by hand, because two release branches were alive at once.
+
+None of this was anyone's bad design. A release train is a reasonable way to ship a product with hundreds of services. It is a poor way to ship a data platform whose changes rarely need to be coordinated with anything else.
+
+## The flotilla
+
+The company was standardising on Flux, with a model it calls flotillas: a Git repository per group of services, which Flux reconciles into every cluster the group runs in.
+
+On 14 November 2024 I merged the first chart into our new repository, `gitops.cloud-intelligence`: the benchmark API, 14 files. The commit titles from that day include "fixes" and "-", which is an accurate record of how it went.
+
+The layout we settled on has three parts.
+
+An **umbrella chart** lists each service as a local dependency with an `enabled` toggle. One Helm release deploys the team's services together, and a cluster that should not run a service switches it off.
+
+**Layered values files** go from general to specific: defaults, then environment, then environment and region, then one cluster. Later files win, and missing files are skipped. A cluster only gets its own file when it differs from everything above it, so most of them have none.
+
+One Flux **HelmRelease** ties it together:
+
+```yaml
+kind: HelmRelease
+spec:
+  chart:
+    spec:
+      chart: charts/entrypoint
+      ignoreMissingValuesFiles: true
+      reconcileStrategy: Revision
+      valuesFiles:
+        - charts/entrypoint/values.yaml
+        - charts/entrypoint/values.${env}.yaml
+        - charts/entrypoint/values.${env}.${aws_region}.${cluster}.yaml
+  driftDetection: { mode: enabled }
+  interval: 1h
+  timeout: 10m
+  test: { enable: true }
+  upgrade:
+    remediation: { retries: 0, strategy: rollback, remediateLastFailure: true }
+```
+
+Three settings in there carry most of the operational weight. Drift detection means a manual change in the cluster is reverted. Helm tests run after every upgrade. If an upgrade fails, Flux rolls back without retrying, so a bad release costs one failed reconcile and not a loop of them.
+
+## Raising the ceiling
+
+Promotion is branch-based: `develop`, `main`, `staging`, `production`. A central catalog repository maps each cluster to the branch it follows, and records a ceiling for each flotilla, the furthest stage it is currently allowed to reach.
+
+A new flotilla starts with its ceiling at development. Getting to production is a sequence of pull requests of one or two lines each:
+
+| Date | Change |
+|---|---|
+| 6 March 2025 | Flotilla registered, ceiling at development |
+| 25 June 2025 | Ceiling raised to integration |
+| 25 June 2025 | Ceiling raised to staging |
+| 7 July 2025 | Ceiling raised to production |
+
+The dates show where the time went. The Flux release object landed in March. The ceiling did not move for almost four months, and then it went from development to production in twelve days.
+
+That gap is the migration. Running in dev clusters was the easy third of the work. The rest was everything production has and dev does not: per-region sizing, identity and permissions for a new namespace, Kafka credentials, licence checks, and the question of how to move live traffic.
+
+## Two deployments, one flag
+
+For a while each service ran twice: the old release from the shared repository and the new one from the flotilla. The question was which one received requests.
+
+Each migrated chart wrapped its Istio route in a flag that defaulted to off:
+
+```yaml
+{{- if .Values.useGitopsVirtualService.enabled }}
+kind: VirtualService
+spec:
+  http:
+    - match: [{ uri: { prefix: "/<api-prefix>/benchmark/graphql" } }]
+      route:
+        - destination:
+            host: <app>-release.cloud-intelligence.svc.cluster.local
+{{- end }}
+```
+
+With the flag off, the flotilla deploys the pods and publishes no route. With it on, requests go to the new deployment.
+
+That made the cutover a values change that could be made one environment at a time and reverted the same way. The flag went on in dev clusters in December 2024, in pre-production on 3 July 2025, and in production on 7 July. That last pull request also added 18 per-region files carrying over the replica counts and resource sizes the services had been running with.
+
+A teammate deleted the flag on 20 August, once nothing depended on the old path. The cleanup removed 71 lines.
+
+The Kafka consumers needed a different trick, since they have no route to switch. They got their own Kafka users, in a pull request titled "Use different kafka users", followed five days later by "Fix kafka user".
+
+## A checkbox
+
+With branch-based promotion, merging to `production` is the deploy. I wanted that merge to be a deliberate act and not the end of a reflex.
+
+The gate I added is small. A workflow reads the pull request description and fails unless one box is ticked:
+
+```yaml
+on:
+  pull_request:
+    types: [opened, synchronize, edited, reopened]
+    branches: [main, staging, canary, production]
+# ...
+if echo "$description" | grep -q '\[x\] Click this checkbox, if you are ready to trigger the promotion.'; then
+```
+
+It is a required check on `main`, `staging` and `production`. It checks nothing about the change. It checks that a person stopped and decided.
+
+## What went wrong
+
+Onboarding a new service, the MCP server, took one pull request and then nine fix commits over three days. The container port was wrong. The chart version went from 1.0.2 back to 1.0.1 and then to 1.0.3. A downstream URL was missing its scheme, and its replacement had the cluster suffix twice. None of those is interesting alone. Together they showed me that the feedback loop for a chart is a version bump plus a reconcile, and that I had no way to see the rendered output before paying for one.
+
+There is a render test now. For a while it had its own bug, which I described in the fix:
+
+> The test hardcoded cross-customer-mcp 0.16.7, so it fails as soon as main deploys another version.
+
+It reads the version from the chart these days.
+
+## Splitting it a year later
+
+In January 2026 we split the flotilla. The reason is in the pull request that created the new repositories:
+
+> When we created our first cloud-intelligence flotilla we grouped all of our services under it. With the growing maturity we now realize that the cider deployments and the async-proxy-service have little to do with the rest of the services.
+
+Grouping by team was the right first cut and the wrong permanent one. The Kafka extractor and the async proxy have their own release rhythm, and bundling them meant every promotion carried services that had not changed.
+
+The split touched seven repositories in a fixed order: create the repositories with branch protection, register the flotillas, ship first releases from the new homes, remove 1,674 lines from the old one, move the permissions and configuration to the new namespace, then raise the ceilings. It took from 16 January to 9 February.
+
+One commit in that sequence is titled "Duplicate for backwards compatibility". For a few weeks the same permissions existed under both the old namespace and the new one. Duplication is cheap, and a production service that loses its permissions mid-migration is not.
+
+## What I would tell another team
+
+**Decide the end state before the tool.** We did not move because Flux beats Argo. We moved because we wanted our own path to production and the company had already picked the road.
+
+**Dev is a third of the work.** Budget for the part between "it runs" and "it serves production traffic". Ours took four months.
+
+**Make every step small enough to be boring.** A ceiling raised one stage per pull request, a route behind a flag, permissions duplicated before they are moved. Each step had an obvious undo.
+
+**Write it down while it hurts.** The most useful thing I produced was the internal page listing every step, every failed command and what its error really meant. The second flotilla setup took half as long. The third was done by someone else.

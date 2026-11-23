@@ -1,297 +1,222 @@
 import Link from "next/link";
-import { HeroSceneLoader } from "@/components/hero-scene-loader";
-import { ArrowRight } from "lucide-react";
-import { GithubIcon, LinkedinIcon } from "@/components/icons";
-import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  FadeIn,
-  ScrollFadeIn,
-  ScrollStagger,
-  ScrollStaggerItem,
-  ScaleOnHover,
-} from "@/components/motion";
-import { projects } from "@/data/projects";
+import { MapSheet } from "@/components/map-sheet";
+import { PostList } from "@/components/post-list";
+import { Profile } from "@/components/profile";
+import { ArrowIcon, ArrowOutIcon, GithubIcon, LinkedinIcon, MailIcon } from "@/components/icons";
+import { totalPrs, totalRepos } from "@/data/work";
 import { getAllPosts } from "@/lib/blog";
+import { asset, siteConfig } from "@/lib/site";
 
-const stack: { name: string; highlighted?: boolean }[] = [
-  { name: "TypeScript", highlighted: true },
-  { name: "React" },
-  { name: "Next.js" },
-  { name: "Python", highlighted: true },
-  { name: "Spark" },
-  { name: "Kafka" },
-  { name: "AWS", highlighted: true },
-  { name: "Kubernetes" },
-  { name: "GitOps / Flux" },
-  { name: "LLMs" },
-  { name: "SQL / NQL" },
-];
-
-const socials = [
-  { href: "https://github.com/LeoBalzoni", icon: GithubIcon, label: "GitHub" },
-  {
-    href: "https://www.linkedin.com/in/leobalzoni/",
-    icon: LinkedinIcon,
-    label: "LinkedIn",
-  },
-];
-
-function SectionEyebrow({ number, label }: { number: string; label: string }) {
-  return (
-    <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-      {number} — {label}
-    </p>
-  );
-}
+const GAMES_POST = "/blog/two-birthdays-two-party-games/";
 
 export default function Home() {
-  const featuredProjects = projects.filter((p) => p.featured).slice(0, 3);
-  const latestPosts = getAllPosts().slice(0, 3);
+  const posts = getAllPosts();
 
   return (
-    <div className="mx-auto max-w-5xl px-6">
-      {/* Hero — full viewport, placeholder for 3D bust */}
-      <section className="flex min-h-[calc(100vh-4rem)] items-center pb-16 pt-8">
-        <div className="grid w-full grid-cols-1 items-center gap-12 md:grid-cols-2">
-          {/* Left: text */}
-          <div>
-            <FadeIn>
-              <p className="text-sm font-medium text-primary">
-                Hey, I&apos;m
-              </p>
-            </FadeIn>
-            <FadeIn delay={0.1}>
-              <h1 className="mt-2 text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl">
-                Leonardo
-                <br />
-                <span>Balzoni</span>
-              </h1>
-            </FadeIn>
-            <FadeIn delay={0.2}>
-              <p className="mt-6 max-w-md text-lg text-muted-foreground">
-                Software engineer at Nexthink, based in Lausanne. I work on
-                cloud data platforms — architecture, pipelines, and the
-                infrastructure that ships them. Lately drawn to the messy
-                parts: untangling complexity, making slow things fast.
-              </p>
-            </FadeIn>
-            <FadeIn delay={0.3} className="mt-8 flex items-center gap-4">
-              <a
-                href="#projects"
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-              >
-                View my work
-                <ArrowRight className="h-4 w-4" />
-              </a>
-              <div className="flex items-center gap-3">
-                {socials.map(({ href, icon: Icon, label }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                    aria-label={label}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </a>
-                ))}
-              </div>
-            </FadeIn>
-          </div>
+    <>
+      <MapSheet />
 
-          {/* Right: 3D Da Vinci bust */}
-          <div className="hidden h-80 md:block lg:h-[28rem]">
-            <HeroSceneLoader />
+      <section id="writing" className="band">
+        <div className="wrap">
+          <div className="band__head">
+            <h2>Writing</h2>
+            <p>
+              Engineering posts written from my own pull requests, one talk, and two party games.
+              The ringed ones are on the route above.
+            </p>
           </div>
+          <PostList posts={posts} />
         </div>
       </section>
 
-      {/* About / Stack */}
-      <section id="about" className="scroll-mt-20 pb-24">
-        <ScrollFadeIn>
-          <SectionEyebrow number="01" label="About" />
-          <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            About
-          </h2>
-          <p className="mt-4 max-w-2xl text-muted-foreground">
-            I work on Nexthink&apos;s Cloud Intelligence platform — the data
-            pipelines, event-driven systems, and Kubernetes infrastructure
-            behind the analytics our customers rely on. A lot of the work
-            today is large-scale and AI-assisted: LLM-driven pipelines running
-            on the AWS suite, Spark jobs feeding Kafka-backed DAGs, and the
-            dashboards (DEX Benchmarks, AppEx, Functional Errors) on top of
-            them. I started as an ML engineer in 2020 and have since drifted
-            toward architecture, backend systems, and the developer experience
-            around them.
-          </p>
-          <p className="mt-4 max-w-2xl text-muted-foreground">
-            I also wear a few non-IC hats: Scrum master for the team,
-            onboarding buddy for new hires, and the person who tends to end up
-            demoing to stakeholders. I like the parts where the work gets
-            ambiguous — shaping a feature before it&apos;s a ticket, profiling
-            something slow, unblocking another team — and the unglamorous
-            parts too, like the release cycle and the test suite that ships
-            with it.
-          </p>
-        </ScrollFadeIn>
-        <ScrollFadeIn delay={0.1}>
-          <h3 className="mt-10 text-sm font-medium uppercase tracking-wider text-muted-foreground">
-            Tech Stack
-          </h3>
-        </ScrollFadeIn>
-        <ScrollStagger className="mt-4 flex flex-wrap gap-2">
-          {stack.map(({ name, highlighted }) => (
-            <ScrollStaggerItem key={name}>
-              <Badge
-                variant={highlighted ? "outline" : "secondary"}
-                className={
-                  highlighted
-                    ? "border-primary/30 bg-primary/10 px-3 py-1 text-sm font-normal text-primary"
-                    : "px-3 py-1 text-sm font-normal"
-                }
-              >
-                {name}
-              </Badge>
-            </ScrollStaggerItem>
-          ))}
-        </ScrollStagger>
-      </section>
-
-      {/* Featured Projects */}
-      <section id="projects" className="scroll-mt-20 pb-24">
-        <ScrollFadeIn className="flex items-end justify-between">
-          <div>
-            <SectionEyebrow number="02" label="Projects" />
-            <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-              Projects
-            </h2>
+      <section id="work" className="band band--ruled">
+        <div className="wrap">
+          <div className="band__head">
+            <h2>Five years, one data platform</h2>
+            <p>
+              At Nexthink I work on Cloud Intelligence, the platform that compares one
+              company&apos;s devices with everyone else&apos;s. I have worked on every layer of it,
+              from the Kafka consumer that reads the events to the screen that shows the result:{" "}
+              {totalPrs} merged pull requests across {totalRepos} repositories.
+            </p>
           </div>
-          <Link
-            href="/projects/"
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-primary"
-          >
-            View all
-            <ArrowRight className="h-3 w-3" />
+          <Profile />
+          <Link href="/work/" className="more">
+            Every repository, and what I did in it
+            <ArrowIcon className="icon" />
           </Link>
-        </ScrollFadeIn>
-        <ScrollStagger className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredProjects.map((project) => (
-            <ScrollStaggerItem key={project.title}>
-              <ScaleOnHover>
-                <Card className="h-full transition-colors hover:border-primary/20">
-                  <CardHeader>
-                    <CardTitle className="text-base">
-                      {project.title}
-                    </CardTitle>
-                    <CardDescription className="line-clamp-2">
-                      {project.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-1.5">
-                      {project.tags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="outline"
-                          className="text-xs font-normal"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </ScaleOnHover>
-            </ScrollStaggerItem>
-          ))}
-        </ScrollStagger>
+        </div>
       </section>
 
-      {/* Latest Posts */}
-      {latestPosts.length > 0 && (
-        <section id="blog" className="scroll-mt-20 pb-24">
-          <ScrollFadeIn className="flex items-end justify-between">
-            <div>
-              <SectionEyebrow number="03" label="Blog" />
-              <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-                Blog
-              </h2>
-            </div>
-            <Link
-              href="/blog/"
-              className="inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-primary"
-            >
-              View all
-              <ArrowRight className="h-3 w-3" />
-            </Link>
-          </ScrollFadeIn>
-          <ScrollStagger className="mt-8 flex flex-col gap-2">
-            {latestPosts.map((post) => (
-              <ScrollStaggerItem key={post.slug}>
-                <Link href={`/blog/${post.slug}/`}>
-                  <div className="group flex items-center justify-between rounded-lg border border-border/70 px-4 py-4 transition-colors hover:border-border hover:bg-muted/50">
-                    <div>
-                      <h3 className="font-medium group-hover:text-foreground">
-                        {post.title}
-                      </h3>
-                      <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
-                        {post.description}
-                      </p>
-                    </div>
-                    <div className="ml-4 hidden shrink-0 text-right text-sm text-muted-foreground sm:block">
-                      <p>
-                        {new Date(post.date).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </p>
-                      <p className="text-xs">{post.readingTime}</p>
-                    </div>
-                  </div>
-                </Link>
-              </ScrollStaggerItem>
-            ))}
-          </ScrollStagger>
-        </section>
-      )}
-
-      {/* Contact */}
-      <section id="contact" className="scroll-mt-20 pb-24">
-        <ScrollFadeIn>
-          <SectionEyebrow number="04" label="Contact" />
-          <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            Get in touch
-          </h2>
-          <p className="mt-4 max-w-lg text-muted-foreground">
-            Want to chat about a project, an idea, or just say hi? GitHub and
-            LinkedIn are the fastest ways to reach me.
-          </p>
-        </ScrollFadeIn>
-        <ScrollStagger className="mt-8 flex items-center gap-4">
-          {socials.map(({ href, icon: Icon, label }) => (
-            <ScrollStaggerItem key={label}>
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:bg-muted hover:text-foreground"
-              >
-                <Icon className="h-4 w-4" />
-                {label}
-              </a>
-            </ScrollStaggerItem>
-          ))}
-        </ScrollStagger>
+      <section id="games" className="band band--lake">
+        <div className="wrap">
+          <div className="band__head">
+            <h2 className="water">On the lake: two birthday games</h2>
+            <p>
+              Every October I build a web app for my own birthday party. Each one has to work
+              once, at a known hour, on whatever phones show up.
+            </p>
+          </div>
+          <div className="games">
+            <article className="game">
+              <div className="game__shots game__shots--pair">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={asset("/games/leooracle-landing.jpg")}
+                  alt="Leo's Oracle on a phone: the title, the line Predict the night. Beat your friends, and a field for a game code."
+                  width={720}
+                  height={1276}
+                  loading="lazy"
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={asset("/games/leooracle-betting.jpg")}
+                  alt="The betting screen: a balance of 1,000 L€ and yes-or-no markets, each with a multiplier."
+                  width={720}
+                  height={1276}
+                  loading="lazy"
+                />
+              </div>
+              <h3>LeoOracle</h3>
+              <p className="game__year">2026, for my 31st</p>
+              <p>
+                A prediction market for a single dinner. Guests bet a virtual currency called L€
+                on questions like &ldquo;Will someone make an unsolicited toast?&rdquo;, then put
+                their phones down until the reveal.
+              </p>
+              <p className="game__links">
+                <a href="https://leo-oracle.vercel.app" rel="noopener noreferrer">
+                  Play it
+                  <ArrowOutIcon className="icon" />
+                </a>
+              </p>
+            </article>
+            <article className="game game--single">
+              <div className="game__shots">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={asset("/games/imaginarena-share.jpg")}
+                  alt="The ImaginArena share image: three cartoon figures facing a burst of light under the words Join the ImaginArena."
+                  width={720}
+                  height={1280}
+                  loading="lazy"
+                />
+              </div>
+              <div className="game__text">
+                <h3>ImaginArena</h3>
+                <p className="game__year">2025, for my 30th</p>
+                <p>
+                  A knockout tournament for image prompts. Two players get the same absurd brief,
+                  such as &ldquo;The Greek gods commuting on a bus&rdquo;, and the room votes on
+                  whose picture wins.
+                </p>
+                <p className="game__links">
+                  <a href="https://imaginarena.vercel.app" rel="noopener noreferrer">
+                    Play it
+                    <ArrowOutIcon className="icon" />
+                  </a>
+                  <a href="https://github.com/LeoBalzoni/ImaginArena" rel="noopener noreferrer">
+                    Source
+                    <ArrowOutIcon className="icon" />
+                  </a>
+                </p>
+              </div>
+            </article>
+          </div>
+          <Link href={GAMES_POST} className="more">
+            How both were built, and what went wrong
+            <ArrowIcon className="icon" />
+          </Link>
+        </div>
       </section>
-    </div>
+
+      <section id="legend" className="band">
+        <div className="wrap legend">
+          <div>
+            <h2>Legend</h2>
+            <dl className="key">
+              <div>
+                <dt>
+                  <svg viewBox="0 0 56 16" aria-hidden="true">
+                    <path className="key__route" d="M2 8h34" />
+                    <circle className="key__ring" cx="46" cy="8" r="5.5" />
+                  </svg>
+                </dt>
+                <dd>Marked route. Each ring is a post or a talk.</dd>
+              </div>
+              <div>
+                <dt>
+                  <svg viewBox="0 0 56 16" aria-hidden="true">
+                    <circle className="key__dot" cx="46" cy="8" r="3.5" />
+                  </svg>
+                </dt>
+                <dd>A post off the route.</dd>
+              </div>
+              <div>
+                <dt>
+                  <svg viewBox="0 0 56 16" aria-hidden="true">
+                    <path className="key__ferry" d="M2 8h34" />
+                    <circle className="key__stop" cx="46" cy="8" r="5.5" />
+                  </svg>
+                </dt>
+                <dd>Ferry line and stop. Side projects, built for fun.</dd>
+              </div>
+              <div>
+                <dt>
+                  <span className="spot">
+                    <b>347</b>
+                  </span>
+                </dt>
+                <dd>Spot height. A count of my merged pull requests, as on the profile above.</dd>
+              </div>
+              <div>
+                <dt>
+                  <svg viewBox="0 0 56 16" aria-hidden="true">
+                    <path className="key__contour" d="M2 11c10-9 18 4 28-3s14-2 24 1" />
+                    <path className="key__contour" d="M2 5c10-6 18 5 28-1s14-3 24-1" />
+                  </svg>
+                </dt>
+                <dd>Contours, lake and forest. Invented, and generated from a seed.</dd>
+              </div>
+            </dl>
+          </div>
+          <div className="about">
+            <h2>Who drew this</h2>
+            <p>
+              I am Leonardo, a software engineer from Rome, living in Lausanne. I started as a
+              machine learning engineer in 2020 and drifted toward architecture, backend systems
+              and the developer experience around them.
+            </p>
+            <p>
+              I also wear a few hats that do not produce commits: Scrum master for the team,
+              onboarding buddy for new hires, and the person who tends to end up demoing to
+              stakeholders. Outside work I climb, I run, and I hold opinions about Italian
+              restaurants.
+            </p>
+            <p>The fastest ways to reach me:</p>
+            <ul className="contact">
+              <li>
+                <a href={siteConfig.linkedin} rel="noopener noreferrer">
+                  <LinkedinIcon className="icon" />
+                  LinkedIn
+                </a>
+              </li>
+              <li>
+                <a href={siteConfig.github} rel="noopener noreferrer">
+                  <GithubIcon className="icon" />
+                  GitHub
+                </a>
+              </li>
+              <li>
+                <a href={`mailto:${siteConfig.email}`}>
+                  <MailIcon className="icon" />
+                  {siteConfig.email}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }

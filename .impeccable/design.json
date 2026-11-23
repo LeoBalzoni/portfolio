@@ -1,0 +1,621 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-21T01:35:13.049Z",
+  "title": "Design System: Leonardo Balzoni",
+  "extensions": {
+    "colorMeta": {
+      "route": {
+        "role": "primary",
+        "displayName": "Waymark Red",
+        "canonical": "oklch(57% 0.201 30)",
+        "tonalRamp": [
+          "oklch(15% 0.121 30)",
+          "oklch(27% 0.201 30)",
+          "oklch(39% 0.201 30)",
+          "oklch(50% 0.201 30)",
+          "oklch(62% 0.201 30)",
+          "oklch(74% 0.201 30)",
+          "oklch(85% 0.141 30)",
+          "oklch(95% 0.070 30)"
+        ]
+      },
+      "route-ink": {
+        "role": "primary",
+        "displayName": "Waymark Red, Inked",
+        "canonical": "oklch(49% 0.175 30)",
+        "tonalRamp": [
+          "oklch(15% 0.105 30)",
+          "oklch(27% 0.175 30)",
+          "oklch(39% 0.175 30)",
+          "oklch(50% 0.175 30)",
+          "oklch(62% 0.175 30)",
+          "oklch(74% 0.175 30)",
+          "oklch(85% 0.123 30)",
+          "oklch(95% 0.061 30)"
+        ]
+      },
+      "lake": {
+        "role": "secondary",
+        "displayName": "Lake",
+        "canonical": "oklch(90% 0.029 235)",
+        "tonalRamp": [
+          "oklch(15% 0.017 235)",
+          "oklch(27% 0.029 235)",
+          "oklch(39% 0.029 235)",
+          "oklch(50% 0.029 235)",
+          "oklch(62% 0.029 235)",
+          "oklch(74% 0.029 235)",
+          "oklch(85% 0.020 235)",
+          "oklch(95% 0.010 235)"
+        ]
+      },
+      "lake-2": {
+        "role": "secondary",
+        "displayName": "Lake Shallow",
+        "canonical": "oklch(85% 0.041 237)",
+        "tonalRamp": [
+          "oklch(15% 0.025 237)",
+          "oklch(27% 0.041 237)",
+          "oklch(39% 0.041 237)",
+          "oklch(50% 0.041 237)",
+          "oklch(62% 0.041 237)",
+          "oklch(74% 0.041 237)",
+          "oklch(85% 0.029 237)",
+          "oklch(95% 0.014 237)"
+        ]
+      },
+      "lake-ink": {
+        "role": "secondary",
+        "displayName": "Lake Ink",
+        "canonical": "oklch(44% 0.085 241)",
+        "tonalRamp": [
+          "oklch(15% 0.051 241)",
+          "oklch(27% 0.085 241)",
+          "oklch(39% 0.085 241)",
+          "oklch(50% 0.085 241)",
+          "oklch(62% 0.085 241)",
+          "oklch(74% 0.085 241)",
+          "oklch(85% 0.060 241)",
+          "oklch(95% 0.030 241)"
+        ]
+      },
+      "lake-line": {
+        "role": "secondary",
+        "displayName": "Depth Line",
+        "canonical": "oklch(67% 0.087 239)",
+        "tonalRamp": [
+          "oklch(15% 0.052 239)",
+          "oklch(27% 0.087 239)",
+          "oklch(39% 0.087 239)",
+          "oklch(50% 0.087 239)",
+          "oklch(62% 0.087 239)",
+          "oklch(74% 0.087 239)",
+          "oklch(85% 0.061 239)",
+          "oklch(95% 0.030 239)"
+        ]
+      },
+      "lake-depth": {
+        "role": "secondary",
+        "displayName": "Depth Tint",
+        "canonical": "oklch(59% 0.100 240)",
+        "tonalRamp": [
+          "oklch(15% 0.060 240)",
+          "oklch(27% 0.100 240)",
+          "oklch(39% 0.100 240)",
+          "oklch(50% 0.100 240)",
+          "oklch(62% 0.100 240)",
+          "oklch(74% 0.100 240)",
+          "oklch(85% 0.070 240)",
+          "oklch(95% 0.035 240)"
+        ]
+      },
+      "shoreline": {
+        "role": "secondary",
+        "displayName": "Shoreline",
+        "canonical": "oklch(57% 0.091 239)",
+        "tonalRamp": [
+          "oklch(15% 0.055 239)",
+          "oklch(27% 0.091 239)",
+          "oklch(39% 0.091 239)",
+          "oklch(50% 0.091 239)",
+          "oklch(62% 0.091 239)",
+          "oklch(74% 0.091 239)",
+          "oklch(85% 0.064 239)",
+          "oklch(95% 0.032 239)"
+        ]
+      },
+      "lake-text": {
+        "role": "secondary",
+        "displayName": "Lake Text",
+        "canonical": "oklch(31% 0.035 238)",
+        "tonalRamp": [
+          "oklch(15% 0.021 238)",
+          "oklch(27% 0.035 238)",
+          "oklch(39% 0.035 238)",
+          "oklch(50% 0.035 238)",
+          "oklch(62% 0.035 238)",
+          "oklch(74% 0.035 238)",
+          "oklch(85% 0.024 238)",
+          "oklch(95% 0.012 238)"
+        ]
+      },
+      "contour": {
+        "role": "tertiary",
+        "displayName": "Contour Sienna",
+        "canonical": "oklch(58% 0.103 55)",
+        "tonalRamp": [
+          "oklch(15% 0.062 55)",
+          "oklch(27% 0.103 55)",
+          "oklch(39% 0.103 55)",
+          "oklch(50% 0.103 55)",
+          "oklch(62% 0.103 55)",
+          "oklch(74% 0.103 55)",
+          "oklch(85% 0.072 55)",
+          "oklch(95% 0.036 55)"
+        ]
+      },
+      "contour-ink": {
+        "role": "tertiary",
+        "displayName": "Contour Ink",
+        "canonical": "oklch(45% 0.088 53)",
+        "tonalRamp": [
+          "oklch(15% 0.053 53)",
+          "oklch(27% 0.088 53)",
+          "oklch(39% 0.088 53)",
+          "oklch(50% 0.088 53)",
+          "oklch(62% 0.088 53)",
+          "oklch(74% 0.088 53)",
+          "oklch(85% 0.062 53)",
+          "oklch(95% 0.031 53)"
+        ]
+      },
+      "index-contour": {
+        "role": "tertiary",
+        "displayName": "Index Contour",
+        "canonical": "oklch(52% 0.099 54)",
+        "tonalRamp": [
+          "oklch(15% 0.059 54)",
+          "oklch(27% 0.099 54)",
+          "oklch(39% 0.099 54)",
+          "oklch(50% 0.099 54)",
+          "oklch(62% 0.099 54)",
+          "oklch(74% 0.099 54)",
+          "oklch(85% 0.069 54)",
+          "oklch(95% 0.035 54)"
+        ]
+      },
+      "forest": {
+        "role": "tertiary",
+        "displayName": "Forest",
+        "canonical": "oklch(84% 0.068 135)",
+        "tonalRamp": [
+          "oklch(15% 0.041 135)",
+          "oklch(27% 0.068 135)",
+          "oklch(39% 0.068 135)",
+          "oklch(50% 0.068 135)",
+          "oklch(62% 0.068 135)",
+          "oklch(74% 0.068 135)",
+          "oklch(85% 0.048 135)",
+          "oklch(95% 0.024 135)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Map Paper",
+        "canonical": "oklch(96% 0.008 114)",
+        "tonalRamp": [
+          "oklch(15% 0.005 114)",
+          "oklch(27% 0.008 114)",
+          "oklch(39% 0.008 114)",
+          "oklch(50% 0.008 114)",
+          "oklch(62% 0.008 114)",
+          "oklch(74% 0.008 114)",
+          "oklch(85% 0.006 114)",
+          "oklch(95% 0.003 114)"
+        ]
+      },
+      "paper-2": {
+        "role": "neutral",
+        "displayName": "Paper Shade",
+        "canonical": "oklch(93% 0.012 117)",
+        "tonalRamp": [
+          "oklch(15% 0.007 117)",
+          "oklch(27% 0.012 117)",
+          "oklch(39% 0.012 117)",
+          "oklch(50% 0.012 117)",
+          "oklch(62% 0.012 117)",
+          "oklch(74% 0.012 117)",
+          "oklch(85% 0.009 117)",
+          "oklch(95% 0.004 117)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(22% 0.004 129)",
+        "tonalRamp": [
+          "oklch(15% 0.002 129)",
+          "oklch(27% 0.004 129)",
+          "oklch(39% 0.004 129)",
+          "oklch(50% 0.004 129)",
+          "oklch(62% 0.004 129)",
+          "oklch(74% 0.004 129)",
+          "oklch(85% 0.003 129)",
+          "oklch(95% 0.001 129)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink 2",
+        "canonical": "oklch(39% 0.012 120)",
+        "tonalRamp": [
+          "oklch(15% 0.007 120)",
+          "oklch(27% 0.012 120)",
+          "oklch(39% 0.012 120)",
+          "oklch(50% 0.012 120)",
+          "oklch(62% 0.012 120)",
+          "oklch(74% 0.012 120)",
+          "oklch(85% 0.008 120)",
+          "oklch(95% 0.004 120)"
+        ]
+      },
+      "ink-3": {
+        "role": "neutral",
+        "displayName": "Ink 3",
+        "canonical": "oklch(50% 0.013 118)",
+        "tonalRamp": [
+          "oklch(15% 0.008 118)",
+          "oklch(27% 0.013 118)",
+          "oklch(39% 0.013 118)",
+          "oklch(50% 0.013 118)",
+          "oklch(62% 0.013 118)",
+          "oklch(74% 0.013 118)",
+          "oklch(85% 0.009 118)",
+          "oklch(95% 0.004 118)"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule",
+        "canonical": "rgb(27 28 26 / 0.16)",
+        "tonalRamp": [
+          "oklch(15% 0.002 129)",
+          "oklch(27% 0.004 129)",
+          "oklch(39% 0.004 129)",
+          "oklch(50% 0.004 129)",
+          "oklch(62% 0.004 129)",
+          "oklch(74% 0.004 129)",
+          "oklch(85% 0.003 129)",
+          "oklch(95% 0.001 129)"
+        ]
+      },
+      "waypoint-white": {
+        "role": "neutral",
+        "displayName": "Waypoint White",
+        "canonical": "oklch(100% 0.000 90)",
+        "tonalRamp": [
+          "oklch(15% 0.002 90)",
+          "oklch(27% 0.004 90)",
+          "oklch(39% 0.004 90)",
+          "oklch(50% 0.004 90)",
+          "oklch(62% 0.004 90)",
+          "oklch(74% 0.004 90)",
+          "oklch(85% 0.003 90)",
+          "oklch(95% 0.001 90)"
+        ]
+      },
+      "relief-shadow": {
+        "role": "neutral",
+        "displayName": "Relief Shadow",
+        "canonical": "oklch(43% 0.045 271)",
+        "tonalRamp": [
+          "oklch(15% 0.027 271)",
+          "oklch(27% 0.045 271)",
+          "oklch(39% 0.045 271)",
+          "oklch(50% 0.045 271)",
+          "oklch(62% 0.045 271)",
+          "oklch(74% 0.045 271)",
+          "oklch(85% 0.031 271)",
+          "oklch(95% 0.016 271)"
+        ]
+      },
+      "relief-light": {
+        "role": "neutral",
+        "displayName": "Relief Light",
+        "canonical": "oklch(99% 0.019 97)",
+        "tonalRamp": [
+          "oklch(15% 0.011 97)",
+          "oklch(27% 0.019 97)",
+          "oklch(39% 0.019 97)",
+          "oklch(50% 0.019 97)",
+          "oklch(62% 0.019 97)",
+          "oklch(74% 0.019 97)",
+          "oklch(85% 0.013 97)",
+          "oklch(95% 0.007 97)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "The name on the map sheet, sized in container-query units."
+      },
+      "page-title": {
+        "displayName": "Page title",
+        "purpose": "The h1 of an inner page."
+      },
+      "post-title": {
+        "displayName": "Post title",
+        "purpose": "The h1 of a post."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section h2 in bands and layers."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Row titles in the post index."
+      },
+      "place-name": {
+        "displayName": "Place name",
+        "purpose": "Waypoint lettering on the map, width 96."
+      },
+      "spot-height": {
+        "displayName": "Spot height",
+        "purpose": "Merged-PR counts, width 88, tabular."
+      },
+      "sheet-line": {
+        "displayName": "Sheet line",
+        "purpose": "Sheet designation or name in the top margin, width 112."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Interface text, legend entries, tables."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Metadata, captions, colophon."
+      },
+      "lede": {
+        "displayName": "Lede",
+        "purpose": "Serif paragraph beside a heading; list descriptions."
+      },
+      "reading": {
+        "displayName": "Reading",
+        "purpose": "Post prose in a 43rem measure."
+      },
+      "water": {
+        "displayName": "Water",
+        "purpose": "Italic, uppercase, letterspaced name of the lake on the map only."
+      },
+      "water-heading": {
+        "displayName": "Water heading",
+        "purpose": "Italic serif heading on the lake band."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "Code blocks, inline code, repository names."
+      }
+    },
+    "shadows": [
+      {
+        "name": "screenshot-on-lake",
+        "value": "0 1.1rem 2.2rem -1rem rgb(18 52 76 / 0.55), 0 0 0 1px rgb(18 52 76 / 0.25)",
+        "purpose": "Phone screenshots in the games band."
+      },
+      {
+        "name": "figure",
+        "value": "0 1rem 2rem -1.1rem rgb(27 28 26 / 0.5), 0 0 0 1px rgb(27 28 26 / 0.16)",
+        "purpose": "Images inside post prose."
+      },
+      {
+        "name": "waypoint-halo",
+        "value": "0 0 0 calc(var(--ring) * 0.4) rgb(211 48 31 / 0.2)",
+        "purpose": "Flat ring around a waypoint on hover and focus; a state, not elevation."
+      },
+      {
+        "name": "lettering-halo",
+        "value": "-webkit-text-stroke: 0.32em var(--paper); paint-order: stroke fill",
+        "purpose": "Paper halo under map lettering that crosses terrain; lake colour on water."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 2px solid var(--route-ink); outline-offset: 3px",
+        "purpose": "Global keyboard focus."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "System easing for hovers, waypoint landing and the lake name settling."
+      },
+      {
+        "name": "route-draw",
+        "value": "2.6s cubic-bezier(0.3, 0.6, 0.2, 1) 0.25s",
+        "purpose": "The route draws once from shore to summit on load."
+      },
+      {
+        "name": "waypoint-land",
+        "value": "0.9s ease, delay 0.35s + index * 0.55s",
+        "purpose": "Waypoints fade in from a 6px blur in route order."
+      },
+      {
+        "name": "water-settle",
+        "value": "1.6s ease 0.2s",
+        "purpose": "The lake name fades in while tracking closes from 0.62em."
+      },
+      {
+        "name": "hover-move",
+        "value": "0.35s to 0.4s ease",
+        "purpose": "Underline growth, arrow gap, ring scale, label slide."
+      },
+      {
+        "name": "hover-colour",
+        "value": "0.2s",
+        "purpose": "Colour and background changes."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "no load animation; transitions 0.01ms; scroll-behavior auto",
+        "purpose": "The finished sheet is shown at once."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "56rem"
+      },
+      {
+        "name": "phone",
+        "value": "36rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Navigation (top margin)",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "The sheet's top margin: sheet line or name left, four plain links right, red underline for hover and current section.",
+      "html": "<header class=\"ds-margin\"><p class=\"ds-margin-sheet\">Sheet 1243<span> · Lausanne · 1:25 000</span></p><nav><a href=\"#\" aria-current=\"page\">Writing</a><a href=\"#\">Work</a><a href=\"#\">Games</a><a href=\"#\">About</a></nav></header>",
+      "css": ".ds-margin{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;min-height:4rem;padding-inline:1.5rem;background:var(--paper);color:var(--ink);border-bottom:1px solid var(--ink);font-family:var(--display);font-size:1.0625rem}.ds-margin-sheet{margin:0;font-weight:700;font-stretch:112%;letter-spacing:.01em;white-space:nowrap}.ds-margin-sheet span{font-weight:500}.ds-margin nav{display:flex;gap:2rem}.ds-margin a{padding-block:.6rem;color:inherit;font-weight:500;text-decoration:none;background:linear-gradient(var(--route),var(--route)) no-repeat 0 calc(100% - .35rem)/0 2px;transition:background-size .35s var(--ease)}.ds-margin a:hover,.ds-margin a[aria-current=\"page\"]{background-size:100% 2px}.ds-margin a:focus-visible{outline:2px solid var(--route-ink);outline-offset:3px;border-radius:2px}"
+    },
+    {
+      "name": "More link",
+      "kind": "button",
+      "refersTo": "more-link",
+      "description": "The system's only action style: a 600-weight link with a 2px route underline and an arrow that steps away on hover.",
+      "html": "<a class=\"ds-more\" href=\"#\">Every repository, and what I did in it<svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></a>",
+      "css": ".ds-more{display:inline-flex;align-items:center;gap:.6rem;padding-block:.5rem;color:var(--ink);font-family:var(--display);font-size:1.125rem;font-weight:600;text-decoration:none;border-bottom:2px solid var(--route);transition:gap .35s var(--ease),color .2s}.ds-more:hover{gap:1rem;color:var(--route-ink)}.ds-more:focus-visible{outline:2px solid var(--route-ink);outline-offset:3px;border-radius:2px}.ds-more .ds-icon{width:1.05em;height:1.05em;flex:none}"
+    },
+    {
+      "name": "Waypoint",
+      "kind": "custom",
+      "refersTo": "waypoint",
+      "description": "A linked place on the route: white ring with a red border, name and note haloed in paper; lifts on hover and focus.",
+      "html": "<div class=\"ds-wp-stage\"><a class=\"ds-wp\" href=\"#\"><span class=\"ds-wp-ring\"></span><span class=\"ds-wp-label\"><span class=\"ds-wp-name\">The 252% benchmark</span><span class=\"ds-wp-note\">Data quality</span></span></a></div>",
+      "css": ".ds-wp-stage{position:relative;height:6rem;background:var(--paper);font-family:var(--display)}.ds-wp{--ring:1.5rem;position:absolute;left:3rem;top:50%;width:0;height:0;color:var(--ink);text-decoration:none}.ds-wp:focus-visible{outline:none}.ds-wp-ring{position:absolute;left:50%;top:50%;width:var(--ring);height:var(--ring);translate:-50% -50%;box-sizing:border-box;border:calc(var(--ring)*.24) solid var(--route);border-radius:50%;background:#fff;transition:scale .4s var(--ease),box-shadow .4s var(--ease)}.ds-wp-label{position:absolute;top:0;left:calc(var(--ring)*.95);translate:0 -50%;display:grid;width:max-content;padding:.35rem .2rem;transition:translate .4s var(--ease)}.ds-wp-name,.ds-wp-note{paint-order:stroke fill;-webkit-text-stroke:.32em var(--paper)}.ds-wp-name{font-size:1.7rem;font-weight:700;font-stretch:96%;line-height:1.08;letter-spacing:-.012em}.ds-wp-note{margin-top:.15em;font-size:.95rem;font-weight:500;color:var(--ink-2)}.ds-wp:hover .ds-wp-ring,.ds-wp:focus-visible .ds-wp-ring{scale:1.25;box-shadow:0 0 0 calc(var(--ring)*.4) rgb(211 48 31/.2)}.ds-wp:hover .ds-wp-name,.ds-wp:focus-visible .ds-wp-name{text-decoration:underline 2px var(--route);text-underline-offset:.18em}.ds-wp:hover .ds-wp-label,.ds-wp:focus-visible .ds-wp-label{translate:.3rem -50%}"
+    },
+    {
+      "name": "Gazetteer row",
+      "kind": "custom",
+      "refersTo": "gazetteer-row",
+      "description": "One post in the index: map marker, title and serif description, right-aligned metadata, ruled above and below.",
+      "html": "<ol class=\"ds-gaz\"><li><a class=\"ds-gaz-row\" href=\"#\"><span class=\"ds-mark ds-mark-route\"></span><span class=\"ds-gaz-main\"><span class=\"ds-gaz-title\">The benchmark that said 252%</span><span class=\"ds-gaz-desc\">A percentage that could not be true, and the week it took to find out why.</span></span><span class=\"ds-gaz-meta\"><span>Post</span><span>3 Nov 2026</span><span>9 min</span></span></a></li><li><a class=\"ds-gaz-row\" href=\"#\"><span class=\"ds-mark ds-mark-ferry\"></span><span class=\"ds-gaz-main\"><span class=\"ds-gaz-title\">Two birthdays, two party games</span><span class=\"ds-gaz-desc\">Web apps that have to work once, at a known hour.</span></span><span class=\"ds-gaz-meta\"><span>Project</span><span>20 Oct 2026</span><span>8 min</span></span></a></li></ol>",
+      "css": ".ds-gaz{margin:0;padding:0;list-style:none;background:var(--paper);color:var(--ink);font-family:var(--display);border-bottom:1px solid var(--ink)}.ds-gaz li{border-top:1px solid var(--rule)}.ds-gaz li:first-child{border-top-color:var(--ink)}.ds-gaz-row{display:grid;grid-template-columns:2.25rem minmax(0,1fr) 9.5rem;gap:.5rem 1.25rem;align-items:start;padding-block:1.6rem;color:inherit;text-decoration:none}.ds-gaz-main{display:grid;gap:.45rem}.ds-gaz-title{font-size:1.75rem;font-weight:650;line-height:1.15;letter-spacing:-.018em;transition:color .2s}.ds-gaz-desc{font-family:var(--text);font-size:1.0625rem;line-height:1.5;color:var(--ink-2)}.ds-gaz-meta{display:grid;gap:.15rem;padding-top:.3rem;font-size:.875rem;color:var(--ink-3);text-align:right}.ds-gaz-meta span:first-child{color:var(--ink);font-weight:600}.ds-gaz-row:hover .ds-gaz-title{color:var(--route-ink)}.ds-gaz-row:focus-visible{outline:2px solid var(--route-ink);outline-offset:3px;border-radius:2px}.ds-mark{width:1.05rem;height:1.05rem;margin-top:.45rem;box-sizing:border-box;border-radius:50%;transition:scale .4s var(--ease)}.ds-mark-route{border:.26rem solid var(--route);background:#fff}.ds-mark-ferry{border:.2rem solid var(--lake-ink);background:var(--lake)}.ds-gaz-row:hover .ds-mark{scale:1.3}"
+    },
+    {
+      "name": "Map markers",
+      "kind": "chip",
+      "refersTo": "mark-route",
+      "description": "The three point symbols shared by the map, the index and the legend: route ring, village dot, ferry stop.",
+      "html": "<div class=\"ds-marks\"><span class=\"ds-pt ds-pt-route\"></span>On the route<span class=\"ds-pt ds-pt-village\"></span>Off the route<span class=\"ds-pt ds-pt-ferry\"></span>Ferry stop</div>",
+      "css": ".ds-marks{display:flex;align-items:center;gap:.6rem;padding:1rem;background:var(--paper);color:var(--ink-2);font-family:var(--display);font-size:1.0625rem}.ds-pt{box-sizing:border-box;border-radius:50%;width:1.05rem;height:1.05rem;margin-left:1rem}.ds-pt:first-child{margin-left:0}.ds-pt-route{border:.26rem solid var(--route);background:#fff}.ds-pt-village{width:.6rem;height:.6rem;background:var(--ink)}.ds-pt-ferry{border:.2rem solid var(--lake-ink);background:var(--lake)}"
+    },
+    {
+      "name": "Spot height",
+      "kind": "custom",
+      "refersTo": "spot-height",
+      "description": "A real merged-PR count lettered like a surveyed height: condensed bold figures after a round dot.",
+      "html": "<p class=\"ds-total\"><span class=\"ds-spot\"><b>347</b></span> merged pull requests</p>",
+      "css": ".ds-total{display:flex;align-items:baseline;gap:.6rem;margin:0;padding:1rem;background:var(--paper);font-family:var(--display);font-size:.95rem;color:var(--ink-3);font-variant-numeric:tabular-nums}.ds-spot{display:inline-flex;align-items:baseline;gap:.3em;font-size:1.6rem;font-weight:700;font-stretch:88%;line-height:1;white-space:nowrap;color:var(--contour-ink)}.ds-spot::before{content:\"\";width:.34em;height:.34em;flex:none;translate:0 -.12em;border-radius:50%;background:currentColor}"
+    },
+    {
+      "name": "Profile stations and bedrock",
+      "kind": "custom",
+      "refersTo": "profile-station",
+      "description": "The foot of the elevation profile: station links on a 2px ink baseline, and the hatched delivery layer under all of them.",
+      "html": "<div class=\"ds-profile\"><ol class=\"ds-stations\"><li><a href=\"#\"><b>Extraction</b><span>Kafka to S3</span></a></li><li><a href=\"#\"><b>Pipelines</b><span>Spark and SQL</span></a></li><li><a href=\"#\"><b>Serving</b><span>GraphQL and REST</span></a></li></ol><p class=\"ds-bedrock\"><b>Delivery</b><span>141 merged pull requests under all of it</span></p></div>",
+      "css": ".ds-profile{background:var(--paper);color:var(--ink);font-family:var(--display)}.ds-stations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;padding:0;list-style:none;border-top:2px solid var(--ink)}.ds-stations li+li{border-left:1px solid var(--rule)}.ds-stations a{display:grid;gap:.1rem;padding:.8rem .5rem .9rem;color:inherit;text-align:center;text-decoration:none;transition:background-color .2s}.ds-stations a:hover{background:var(--paper-2)}.ds-stations a:focus-visible{outline:2px solid var(--route-ink);outline-offset:3px;border-radius:2px}.ds-stations b{font-size:1.15rem;font-weight:650}.ds-stations span{font-size:.9rem;color:var(--ink-3)}.ds-bedrock{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem 1rem;margin:0;padding:.85rem 1rem;border:1px solid var(--contour);border-top:0;background:repeating-linear-gradient(-55deg,rgb(168 104 58/.2) 0 1px,transparent 1px 7px);font-size:.95rem}.ds-bedrock b{font-weight:650}"
+    },
+    {
+      "name": "Lake band",
+      "kind": "card",
+      "refersTo": "lake-band",
+      "description": "The one filled field: lake ground edged with a shoreline, italic serif water heading, lake-ink links.",
+      "html": "<section class=\"ds-lake\"><h2>On the lake: two birthday games</h2><p>Every October I build a web app for my own birthday party.</p><a class=\"ds-lake-more\" href=\"#\">How both were built, and what went wrong<svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></a></section>",
+      "css": ".ds-lake{padding:2.5rem 1.5rem;background:var(--lake);border-block:1.5px solid #3f7fa8;color:#1f3340}.ds-lake h2{margin:0;font-family:var(--text);font-style:italic;font-weight:500;font-size:2.4rem;line-height:1.05;letter-spacing:.005em;color:var(--lake-ink)}.ds-lake p{max-width:46ch;margin:.9rem 0 0;font-family:var(--text);font-size:1.0625rem;line-height:1.55}.ds-lake-more{display:inline-flex;align-items:center;gap:.6rem;margin-top:1.5rem;padding-block:.5rem;color:var(--ink);font-family:var(--display);font-size:1.125rem;font-weight:600;text-decoration:none;border-bottom:2px solid var(--lake-ink);transition:gap .35s var(--ease),color .2s}.ds-lake-more:hover{gap:1rem;color:var(--lake-ink)}.ds-lake-more:focus-visible{outline:2px solid var(--route-ink);outline-offset:3px;border-radius:2px}.ds-lake .ds-icon{width:1.05em;height:1.05em;flex:none}"
+    },
+    {
+      "name": "Prose",
+      "kind": "custom",
+      "refersTo": "inline-code",
+      "description": "Reading text: Literata with route-underlined links, inline code on paper shade, sienna-ticked lists and a ruled code block.",
+      "html": "<div class=\"ds-prose\"><p>Each folder held a <code>deploy.yaml</code> and a <a href=\"#\">Helm chart version</a>.</p><ul><li>One repository shared by every team.</li><li>Seventy-six one-line pull requests.</li></ul><pre><code># values.yaml\ntag: 2024.5.0</code></pre></div>",
+      "css": ".ds-prose{max-width:43rem;padding:1rem;background:var(--paper);color:var(--ink);font-family:var(--text);font-size:1.2rem;line-height:1.68}.ds-prose>*{margin:0}.ds-prose>*+*{margin-top:1.25em}.ds-prose a{color:inherit;text-decoration-thickness:1px;text-underline-offset:.2em;text-decoration-color:var(--route)}.ds-prose a:hover{color:var(--route-ink)}.ds-prose a:focus-visible{outline:2px solid var(--route-ink);outline-offset:3px;border-radius:2px}.ds-prose ul{display:grid;gap:.45em;padding-left:1.5rem;list-style:none}.ds-prose li{position:relative}.ds-prose li::before{content:\"\";position:absolute;left:-1.25rem;top:.78em;width:.6rem;height:1px;background:var(--contour-ink)}.ds-prose code{font-family:var(--mono);font-size:.84em;padding:.12em .34em;border-radius:3px;background:var(--paper-2)}.ds-prose pre{padding:1.1rem 1.25rem;border:1px solid var(--rule);border-radius:4px;background:#eceee6;overflow-x:auto;font-size:.875rem;line-height:1.6}.ds-prose pre code{padding:0;background:none;font-size:inherit}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The National Map Sheet",
+    "overview": "The site is drawn as one sheet of the Swiss national topographic map: Sheet 1243, Lausanne, 1:25 000. The home page is the map itself, a generated terrain of sienna contours, cool relief shading and forest tint rising from a pale lake, with the name lettered at wall-map scale and a dashed red route climbing from the shore to a summit. Every ringed waypoint on that route is a piece of writing. The pages around it are the sheet's margins and its companion documents: a gazetteer of posts, an elevation profile of the work, a legend, a scale bar in the colophon.\n\nThe system is a printed map read in daylight. One light theme, paper ground, hairline rules, flat ink. Each colour carries a cartographic meaning and keeps it everywhere: red is the way to go, blue is water and play, sienna is ground and anything counted, green is forest and lives only in the terrain. Type follows map lettering: an upright grotesque in several widths for places and interface, italic serif for water, serif text for reading. Numbers are measurements: spot heights are real merged pull-request counts, and the profile's silhouette is plotted from them.\n\nDensity is generous on the map and in the bands below it, then tightens into ruled index rows on the work page and a single 43rem reading column on posts. Motion is the drawing of a line: the route draws once from shore to summit, waypoints land in order, the lake name settles, and nothing bounces.",
+    "keyCharacteristics": [
+      "One light theme on cool map paper; ink hairlines instead of boxes.",
+      "A single signal red, reserved for the route, its rings and the underline of a link worth following.",
+      "Lake blue as a full-width field for the side projects, with its own ink and italic serif lettering.",
+      "Sienna for contours, the elevation profile, spot heights and list ticks: the colour of measured ground.",
+      "Archivo on its width axis for places and interface, Literata for reading and for water, JetBrains Mono for code.",
+      "Generated terrain (seed 1243) in two drawings of the same sheet: landscape, and portrait for narrow screens."
+    ],
+    "rules": [
+      {
+        "name": "The One Route Rule",
+        "body": "Red marks the way to go and nothing else: the route, its rings, and the underline of a link. No red fills, no red headings, no red text at rest.",
+        "section": "colors"
+      },
+      {
+        "name": "The Water Rule",
+        "body": "Lake blue appears where there is water or play: the map's lake, the games band, the ferry line and its markers. Platform work never sits on blue.",
+        "section": "colors"
+      },
+      {
+        "name": "The Measured Ground Rule",
+        "body": "Sienna belongs to terrain and to counts taken from the real history: contours, the profile, spot heights, list ticks. A sienna number is always a real merged-PR count.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lettering Rule",
+        "body": "Land and interface are upright Archivo; water is italic Literata; reading is roman Literata. A face never crosses into another's territory.",
+        "section": "typography"
+      },
+      {
+        "name": "The Width Rule",
+        "body": "Emphasis within Archivo comes from the width axis as well as weight: 88 for spot heights, 96 for place names, 100 for display, 112 for the sheet line. Do not reach for a second sans.",
+        "section": "typography"
+      },
+      {
+        "name": "The Open Water Rule",
+        "body": "Letterspaced capitals are how a map names water, and that is their only use here. No tracked uppercase labels over headings or sections.",
+        "section": "typography"
+      },
+      {
+        "name": "The Printed Sheet Rule",
+        "body": "Nothing drawn in ink casts a shadow. Only a photograph or screenshot placed on the sheet does.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep one light theme on `paper`. The dark and light toggle was removed on purpose.",
+      "Do give every new colour use a cartographic reason: red for the route and links, blue for water and side projects, sienna for ground and counts, green for forest in the terrain only.",
+      "Do use `route-ink` when red must be read as text, and `route` only for lines, rings and underlines.",
+      "Do separate content with rules: solid 1px ink to open and close, `rule` hairlines between rows.",
+      "Do size anything placed on the sheet in container-query units and position it in percentages of the drawing.",
+      "Do halo lettering that crosses terrain with a paper stroke painted under the fill (0.32em), in `lake` when it sits on water.",
+      "Do set figures as tabular Archivo and make every spot height a real, sourced count.",
+      "Do change the terrain by editing and re-running `scripts/generate-terrain.mjs`, keeping its colours in step with the tokens here.",
+      "Do keep motion to lines that draw and labels that settle, on cubic-bezier(0.16, 1, 0.3, 1), and show the finished state under reduced motion."
+    ],
+    "donts": [
+      "Don't add a dark theme or a theme toggle.",
+      "Don't fill a button or a panel with red, or set resting text in `route`.",
+      "Don't put platform work on lake blue, or use forest green in the interface.",
+      "Don't box content in cards. Lists are ruled rows; the only filled field is the lake.",
+      "Don't put a shadow on anything drawn in ink. Shadows belong under screenshots and figures.",
+      "Don't set tracked uppercase anywhere but a water name on the map.",
+      "Don't introduce a second sans or a decorative display face; use Archivo's width axis.",
+      "Don't round the corners of sections, lists, the profile or the sheet. Radius is for point symbols, code and inset rasters.",
+      "Don't invent a number for a spot height or a shape for the profile; both are measurements.",
+      "Don't hide the four navigation links behind a menu at any width."
+    ]
+  }
+}

@@ -1,0 +1,129 @@
+---
+title: "Two birthdays, two party games"
+description: "For my 30th I built an image-prompt tournament. For my 31st, a prediction market for one dinner. Notes on building software that has to work exactly once, in front of your friends."
+date: "2026-11-21"
+kind: "games"
+tags: ["side projects", "next.js", "supabase", "game design"]
+---
+
+I have a habit now. A few weeks before my birthday, on 11 October, I decide the party needs a game, and that the game needs to be a web app I have not written yet.
+
+There are two of them so far, each built for one night and my friends' phones. Both are still online.
+
+## ImaginArena: a bracket for prompts
+
+<GameFacts year="2025" live="https://imaginarena.vercel.app" code="https://github.com/LeoBalzoni/ImaginArena" />
+
+The idea fits in one sentence. Two players get the same absurd brief, each of them generates an image for it, and everyone who is not playing that match votes for the better one. The winner moves up the bracket until there is one champion.
+
+The briefs come from a list I wrote by hand, in English and Italian:
+
+- A refrigerator proposing to a toaster in Paris
+- The Greek gods commuting on a bus
+- A cat DJ spinning vinyls in a Berlin nightclub
+- A dentist fighting a dragon in his office
+
+<Figure
+  src="/games/imaginarena-share.jpg"
+  alt="The ImaginArena share image: three cartoon figures facing a burst of light, with the words Join the ImaginArena."
+  caption="The share image guests could post after the first 32-person tournament."
+  width="720"
+  height="1280"
+  narrow="true"
+/>
+
+### How it runs
+
+Guests sign up with a username and join a tournament of 2, 4, 8, 16 or 32 people. I start it by hand. If the room is short of a power of two, bots with names like CyberPicasso, RoboRembrandt and DataDaVinci fill the empty seats.
+
+Each match shows its brief to both players. They make an image in whatever tool they like, upload it, and voting opens for everybody else. One vote per person per match, which the database enforces with a unique constraint on match and voter. When I end the vote, the image with more votes wins. A tie is settled by an animated coin toss.
+
+The part people assume is there and is not: the app never calls an image model. The submission screen links out to an image generator and the player uploads the result. That removed API keys, cost limits and rate limits from a project with a three-week deadline.
+
+### What I would defend, and what I would not
+
+Two decisions held up well on the night.
+
+The first is anonymous voting. Voters see "Submission A" and "Submission B", and the left and right order is shuffled per viewer, so nobody can vote for their friend by position.
+
+The second is not trusting realtime on its own. The app subscribes to database changes, and it also polls every couple of seconds and has a manual refresh button. A room full of phones on shared Wi-Fi is not the place to find out that a websocket dropped.
+
+The part I would not defend is the security model. Everything runs in the browser against Supabase, and admin controls are mostly gated in the interface. For a room of friends that was acceptable. For strangers it would not be, and that lesson went straight into the next game.
+
+The repository's second commit, 42 minutes after the first, is titled "First vibe coded pass". It took 43 commits over three weeks to get from that to something I trusted in front of a room.
+
+## LeoOracle: betting on the evening
+
+<GameFacts year="2026" live="https://leo-oracle.vercel.app" />
+
+For the 31st, the game was the dinner itself. I wrote yes-or-no questions about the night, set odds on each side, and gave all the guests 1,000 L€ of virtual money to bet with.
+
+Some of the markets:
+
+- Will Leo say "31" before 22:30?
+- Will someone mention an ex?
+- Will someone make an unsolicited toast?
+
+<FigureRow>
+  <Figure
+    src="/games/leooracle-landing.jpg"
+    alt="The Leo's Oracle landing screen on a phone: the title, the line Predict the night. Beat your friends, and a field for a game code."
+    caption="Joining takes a code and a name."
+    width="720"
+    height="1276"
+  />
+  <Figure
+    src="/games/leooracle-betting.jpg"
+    alt="The betting screen: a balance of 1,000 L€ and four yes-or-no markets, each with a multiplier for yes and for no."
+    caption="A Trading Day: pick a side, pick a stake."
+    width="720"
+    height="1276"
+  />
+</FigureRow>
+
+### The loop
+
+Guests scan a QR code, pick a name, and they are in. There are no accounts.
+
+The evening is split into "Trading Days". When I open one, its questions appear and people bet: one bet per market, minimum 10 L€, no changing your mind. When I close it, every phone says the same thing: "Put your phone down and enjoy dinner 🍝".
+
+That screen is the most important design decision in the app. A party game that keeps people staring at their phones has failed at being a party game. So betting windows are short, results arrive all at once, and in between there is nothing to look at. The leaderboard is hidden while betting is open, and your score counts stakes that are still in play, so ranks only move at the reveal.
+
+If you lose everything, the app tells you to "Convince the table you deserve a rescue", and the table decides.
+
+### No market maker
+
+A real prediction market moves its prices as people trade. I wrote that out of the spec on the first day:
+
+> Bet multipliers are fixed. Do not implement dynamic market pricing, order books, AMMs.
+
+I set a multiplier for yes and one for no on each question, and a winning bet pays the stake times the multiplier, rounded down. With fifteen people and five questions per round, dynamic pricing would have added a great deal of machinery and no extra fun.
+
+Even this version had one bug worth writing down. The payout is `floor(stake × multiplier)`, and in floating point 100 × 1.15 is 114.999…, which floors to 114. The fix is to do the arithmetic in hundredths:
+
+```ts
+Math.floor((amount * Math.round(multiplier * 100)) / 100)
+```
+
+One L€ is nothing, until the leaderboard is decided by one L€ and the person who lost is sitting next to you.
+
+### Built so it cannot go wrong at the table
+
+Everything I was unhappy with in ImaginArena got fixed here.
+
+- Browsers never talk to the database. All rules are enforced in Postgres, and actions within a game are serialised, so two all-in bets sent at the same instant cannot overspend a balance.
+- Players never receive anyone else's balance or bets while a round is open. There is nothing to find in the network tab.
+- Realtime carries no data. The server broadcasts "something changed" and each phone fetches a fresh snapshot. Behind that sit a 15-second poll, a refetch whenever the phone wakes up or reconnects, and a version number so a slow response cannot overwrite a newer one.
+- The host resolves questions in private and can change the picks, then reveals a whole round in one action.
+
+It has unit and integration tests, and browser tests at iPhone and Android sizes. For a birthday party.
+
+The first commit was on 1 October. The build that ran the party was tagged the night before, nine days later. In the three days after the party I removed the birthday from it, so anyone can create a game for their own dinner.
+
+## Why I keep doing this
+
+A party game has an unusually honest deadline. It has to work once, at a known hour, on whatever phones show up, on bad Wi-Fi, for people who will not read instructions and should not have to. There is no second release.
+
+That turns out to be good practice for the day job. The habits I trust most at work, a server that owns the rules and a boring fallback under every clever mechanism, are the ones that kept two birthday dinners from turning into a debugging session.
+
+Next October I will need a third idea.

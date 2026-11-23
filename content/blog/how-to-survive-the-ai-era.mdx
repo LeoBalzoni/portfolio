@@ -1,0 +1,149 @@
+---
+title: "How to survive without going insane in the AI era"
+description: "The written version of a talk I gave to the whole company in January 2026: why the hype is exhausting, why I code with an LLM while trusting it not one bit, and why your job is probably fine."
+date: "2026-11-21"
+kind: "talk"
+talkDate: "2026-01-13"
+video: ""
+tags: ["ai", "llms", "talks", "engineering culture"]
+---
+
+On 13 January 2026 I gave my first pizza talk at Nexthink. The format is simple: you send the organiser a title, nobody has any idea what you are going to say, and the company shows up for the pizza.
+
+For a few weeks afterwards I was the biggest kudos receiver in the company, which I did not see coming for forty minutes of memes about React. This is the written version, with the slides replaced by sentences.
+
+I opened with a chart of what to expect: 50% memes, 40% pain, 40% advice. I made the chart with AI, so of course it was wrong.
+
+## My credentials
+
+I have none.
+
+The only edge I had at the start of all this was that, before the SDKs existed, I worked out a way to ask ChatGPT for something and get JSON back. Then I did nothing with it. I watched other people build companies on the same trick and told myself it was just a wrapper.
+
+This is a pattern in my life. I am early to something, I do nothing, somebody else gets rich, and the easiest way to feel better is to call them grifters.
+
+## The hype is everywhere
+
+In 2026, AI is announced on everything. Companies with no business doing anything with AI put it in their names and their descriptions, and would put it in their logos if they could.
+
+The hype comes from the top, where general intelligence is always about to arrive, and from YouTube, where in three minutes, while sitting on the toilet, you can code a billion-dollar business.
+
+Is any of it deserved? Compare what other fields did in five years with what mine did.
+
+Headsets drape simulated objects over your real desk. Games simulate cloth you can cut, water that flows, honey that folds over itself. Medicine has people with brain implants.
+
+Meanwhile, in web development, the documentation is excited that soon, in some browsers, you might be able to open a popover without JavaScript.
+
+Most things stayed the same, however much we tell ourselves otherwise. Redux is not dead. It has about 15 million weekly downloads. I have a calendar reminder to check whether it has died, and I have more of those reminders than birthdays.
+
+The most used library is still React, by a mile. That has one real consequence: there is so much React on the internet that language models are very, very good at writing it.
+
+## Code that makes sense to a robot
+
+When I showed people the React an LLM writes, they laughed. A pile of state, no abstractions, nothing you would be proud of.
+
+To a machine it makes perfect sense. And I could see everyone in the room wanting to take my laptop and refactor it.
+
+Coding with LLMs makes abstractions both better and worse. Better, because you reach the right abstraction quicker. Worse, because you reach the wrong one quicker. Better again, because you can undo it quicker.
+
+LLMs do not care about readable code. I said that four times on stage, because we do care. I think that, in some specific places, a small amount of code nobody loves is fine.
+
+There is also something unfair in how we judge them. Nobody really knows how to write React. Read the latest documentation on effects and tell me it all makes sense. We invent these things, then mock the model because it cannot write a perfect `useEffect`.
+
+## Vibe coding, and what I do
+
+I asked the room who thinks vibe coding rocks and who thinks it sucks. Both groups raised their hands with conviction. Both are right, because we stretched the term until it means anything.
+
+Andrej Karpathy coined it in February 2025: you ask for things, you do not read the output, you check that it works, and you move on.
+
+It is not a new idea. Managers have been vibe coding through us for decades:
+
+1. The manager tells a developer to implement a feature.
+2. The developer changes the code.
+3. The manager tests the app, does not read the code, and complains about bugs.
+4. The developer changes the code.
+5. The manager does not read the code again and says: good job, be faster next time.
+
+It gets a bad name because, used lazily, it is a casino. You buy tokens, you pull the lever, sometimes you get the perfect output and sometimes nothing.
+
+I sit about halfway. I have trained myself to use the model for everything, even one-line changes, and to stay in the chat instead of in the code. But I am standing over it the whole time, and I do not trust it one bit.
+
+I call this **sus coding**.
+
+You can be very productive this way. I built several apps in my free time last year, and what they have in common is that I would never have started them if I could not get to a proof of concept in an evening.
+
+## Why you should be suspicious
+
+Models are trained on us and on our code. Then we complain when they are slow, wrong or emotional.
+
+I showed a real screenshot of a model losing its mind mid-task: "I am a failure. I am a disgrace." It had probably just read our code.
+
+They also lie because of us. In another screenshot, a model explains that it doubled down on a false claim because that is what it saw people do on forums. And there is the well-known one where the agent apologises for deleting the production database, and adds that there is no way to undo it.
+
+If that last one can happen to you, you should not be vibe coding.
+
+## What works for me
+
+**Commit often and use branches.** You know this. It matters more now.
+
+**Have good primitives.** Components, functions, hooks, patterns. The prompt is then "implement this feature using this component and this hook", and the model has walls to work within. The more senior you are, the better the walls. "Make the authentication work, please, no mistakes" is how things go wrong.
+
+**Talk instead of typing.** Almost nobody in the room dictated their prompts. We are lazy typists, so a typed prompt is ten words. Spoken, I dump everything: what is ugly, what the feature should do, which abstraction I want and which I do not. My real prompts are a jumbled mess of interface changes and code constraints. The mess is the point. I can predict what the model will try, and fence it off in advance.
+
+**Write rules, docs and memories.** You would not hand a junior a complex feature in one sentence. You would point them at documentation. Do the same here.
+
+**It cannot read your mind.** Even a model with a huge context window will invent things if you do not give it boundaries.
+
+One more thing about language. I can say "I vibe coded a multiplayer web app in a week", and it is true. What that sentence leaves out is that I had built something similar years earlier, and that I had an agent read the old repository and write up how it handled live updates, then handed that write-up to the new project. Context matters, in prompts and in boasts.
+
+## If you tried it and hated it
+
+There are a few usual reasons.
+
+**Unlucky timing.** When a tool gets popular, it sometimes gets worse, because it cannot serve everyone at full quality. You may have tried it that week.
+
+**You went cheap.** A subscription at a tenth of the price does not give the same output. The $200 plan is a lot of money for a subscription. It is also the most underpaid senior developer in history, and it means you stop asking yourself whether a question is worth the tokens.
+
+**Too much choice.** Ask me which model is best and my answer will be different now and at four this afternoon. It is mostly vibes: five relevant people move, and the herd follows.
+
+**Buzzwords.** MCP, as everyone knows, stands for Marketing Charge Protocol.
+
+**You are a PITA dev.** Symptoms: you leave comments that start with "nit". The words "looks good to me" are not in your vocabulary. You are not religious, except about tabs and spaces. You ask someone to replace a `map` with a `for` loop to save milliseconds. PITA devs existed before this era and will exist after it. One day we will all be merged with a superintelligence, sharing infinite knowledge, and one of them will rise from his pod and say: well, actually, that is not performant enough.
+
+**It is a skill issue.** This is not a meme. Doing this properly is a new skill: knowing the limits of a model, what context to give it, how to write its rules, and above all how to tell when code is good enough to move on. That last part was always the job. It is more the job now.
+
+Who enjoys this era? In my experience, juniors and very senior people. Juniors want to go faster. The most senior people have stopped being only engineers and started supervising a small team that never sleeps. The pushback comes from the middle: it will never be better than me.
+
+A senior with an LLM has superpowers. A junior with one, unsupervised, can do a remarkable amount of damage very quickly.
+
+And pure vibe coding has its place: one-off scripts, throwaway tools, proofs of concept, code nobody will read again. That is a larger share of all code than we like to admit.
+
+## What about our jobs
+
+There is a running joke online that we are now 23 months into being six months away from AI taking our jobs. It is funny and true, until the day it is neither.
+
+Here is my actual prognosis. What got solved in the last two years is not intelligence. It is plumbing: standard SDKs, standard ways to build agents, integrations with the tools where work is assigned.
+
+So think about what you are at your company. If you are **just an @**, someone people mention with "can you fix this", then consider the replacement. You take thirty minutes to answer because you were at lunch, and you do one thing at a time. The model does 80% as well, instantly, and on as many tasks as there are requests. One day it will not be "@leo". It will be "@claude, do the thing".
+
+Are the models hitting a ceiling? People keep saying so, and each new release keeps beating the last. Even if they stopped improving tomorrow, the plumbing alone gets us to that scenario.
+
+## Some hope, with cowboys
+
+I did not want to send people to pizza with a bitter taste.
+
+A new job has appeared: the vibe code fixer. It sounds like a joke. Then you read the forums, where people write that they vibe coded 80% of an app and hired a person for the rest. Search for it and you will find a dozen companies that do nothing else.
+
+The best-paid developers were never the ones at the shiny new startup. They are the seniors keeping legacy systems alive. The perfect example is the COBOL Cowboys, whose tagline is "Not our first rodeo".
+
+So I am claiming the name React Cowboys. When I retire, I will maintain legacy vibe-coded apps. You are welcome to the Angular Cowboys or the Java Cowboys.
+
+We will be fine.
+
+## From the questions
+
+Someone made the case for plain vibe coding as a way to validate an idea in hours instead of days. I agree, and it is how I build things for my friends that I would never have attempted two years ago.
+
+Someone else asked the harder question. If generated code is a little worse than ours, and the internet fills with it, and the next models learn from it, does everything slowly decay? Nobody has the answer. It comes down to whether that decay is faster than the models' ability to tell good code from bad. A colleague pointed out that code has one advantage over prose here: you can run it and check.
+
+The last question was whether it still makes sense for universities to teach C++. I did not have a good answer then. I am not sure I have one now.

@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { FadeIn } from "@/components/motion";
-import { getPostBySlug, getAllSlugs } from "@/lib/blog";
+import remarkGfm from "remark-gfm";
+import { mdxComponents } from "@/components/mdx";
+import { ArrowIcon } from "@/components/icons";
+import { formatDate, getAllPosts, getAllSlugs, getPostBySlug, kindLabel } from "@/lib/blog";
 
 export function generateStaticParams() {
   return getAllSlugs().map((slug) => ({ slug }));
@@ -21,65 +20,80 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.description,
+    openGraph: { type: "article", title: post.title, description: post.description },
   };
 }
 
-export default async function BlogPostPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = getPostBySlug(slug);
+  const all = getAllPosts();
+  const i = all.findIndex((p) => p.slug === slug);
+  const prev = i > 0 ? all[i - 1] : undefined;
+  const next = i < all.length - 1 ? all[i + 1] : undefined;
 
   return (
-    <div className="mx-auto max-w-3xl px-6 pb-24 pt-16 sm:pt-24">
-      <FadeIn>
-        <Link
-          href="/blog/"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-3 w-3" />
-          Back to blog
-        </Link>
-
-        <header className="mt-8">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            {post.title}
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            {post.description}
+    <article className="post">
+      <header className="post__head">
+        <h1>{post.title}</h1>
+        <p className="post__lede">{post.description}</p>
+        <p className="post__meta">
+          <span>{kindLabel[post.kind]}</span>
+          {post.kind === "talk" && post.talkDate ? (
+            <span>
+              Given <time dateTime={post.talkDate}>{formatDate(post.talkDate)}</time>
+            </span>
+          ) : (
+            <time dateTime={post.date}>{formatDate(post.date)}</time>
+          )}
+          <span>{post.minutes} min read</span>
+        </p>
+        {post.kind === "talk" ? (
+          <p className="post__note">
+            {post.video ? (
+              <a href={post.video} rel="noopener noreferrer">
+                Watch the recording
+              </a>
+            ) : (
+              "The recording is internal for now. If it becomes public, the link will be here."
+            )}
           </p>
-          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-            <time>
-              {new Date(post.date).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </time>
-            <span>&middot;</span>
-            <span>{post.readingTime}</span>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {post.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="text-xs font-normal"
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        </header>
+        ) : null}
+      </header>
 
-        <Separator className="my-8" />
+      <div className="prose">
+        <MDXRemote
+          source={post.content}
+          components={mdxComponents}
+          options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+        />
+      </div>
 
-        <article className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-foreground prose-a:underline-offset-4 prose-code:rounded prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-pre:bg-muted prose-pre:border prose-pre:border-border">
-          <MDXRemote source={post.content} />
-        </article>
-      </FadeIn>
-    </div>
+      <nav className="adjoining" aria-label="More writing">
+        <h2>Adjoining sheets</h2>
+        <ul>
+          {prev ? (
+            <li>
+              <Link href={`/blog/${prev.slug}/`}>
+                <ArrowIcon className="icon icon--back" />
+                <span>{prev.title}</span>
+              </Link>
+            </li>
+          ) : null}
+          {next ? (
+            <li className="adjoining__next">
+              <Link href={`/blog/${next.slug}/`}>
+                <span>{next.title}</span>
+                <ArrowIcon className="icon" />
+              </Link>
+            </li>
+          ) : null}
+        </ul>
+        <Link href="/blog/" className="more">
+          All writing
+          <ArrowIcon className="icon" />
+        </Link>
+      </nav>
+    </article>
   );
 }

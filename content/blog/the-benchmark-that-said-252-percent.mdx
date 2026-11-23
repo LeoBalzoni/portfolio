@@ -1,0 +1,107 @@
+---
+title: "The benchmark that said 252%"
+description: "A handful of devices with corrupt telemetry pushed a cross-company average past anything possible, and nothing between the computation and the API noticed. What the audit found and where we put the guard."
+date: "2026-11-21"
+kind: "post"
+tags: ["data quality", "spark", "benchmarks", "data platform", "observability"]
+---
+
+Part of what my team builds is benchmarking. A company using Nexthink can see how its devices compare with those of other companies: boot times, crashes, memory, and so on. Each benchmark is an aggregate over many tenants, computed nightly, published to a serving bucket and read by an API.
+
+One of those benchmarks is average used memory, as a percentage. In production, it was served as 252%.
+
+## What happened
+
+The mean was computed as the sum of every device's value divided by the number of devices. A few devices were reporting corrupt memory telemetry, with values far above 100. Averaged with everything else, they pulled the result past anything possible.
+
+The arithmetic was correct. The input was wrong, and as I wrote in the pull request that followed, nothing between compute and the API noticed.
+
+## The first fix, and why it was not enough
+
+The first change was seven lines. Count a device only if its value is between 0 and 100, and divide by the number of devices that were counted.
+
+That fixed used memory. It also raised an obvious question. If one percentage could reach 252, what were the other seventy metrics doing?
+
+## The audit
+
+I took one week of production data and checked every benchmark definition against it. For each metric I chose a plausible bound and put it next to the 99.9th percentile of real values, to be sure the bound would not cut off legitimate devices. Boot duration, for example, got a ceiling of one hour, against a 99.9th percentile of 656 seconds.
+
+The findings were not subtle.
+
+**Most device metrics were unbounded sums.** The data contained an average boot time of 4.07 million seconds, a device reporting 190 petabytes of free disk, and a CPU interrupt value of minus 17,130 percent.
+
+**Weights counted devices that had no value.** This one is quieter and, I think, worse. Take second-GPU usage. About 94% of devices have no second GPU. The old formula divided by all devices, so the published "average" was around 0.05%. Among devices that do have one, it is around 1%.
+
+A small version of the same thing: of 100 devices, 6 have a second GPU, each at 1% usage. Divide by 100 and the average is 0.06%. Divide by 6 and it is 1%. The first number answers a question nobody asked.
+
+**A ratio went above 1.** A crash ratio came out as 1.594, because its numerator and denominator were counted over different sets of processes. For 134 combinations of tenant, binary and version, there were more crashed devices than devices.
+
+**Three legacy benchmarks had not been published for two months**, while an interface was still reading them.
+
+After the changes, second-GPU usage moved from the 0.04 to 0.09% range to 0.75 to 1.2%. Average free disk in one region went from 677 GB to 268 GB, a difference caused by a single device. Most other metrics moved by less than 5%, which was the reassuring part. The 134 impossible crash counts went to zero.
+
+The rule that came out of it is one sentence in the pull request:
+
+> A value counts only if it lies within a plausible bound, and the weight counts the same values.
+
+## A range on every metric
+
+Each metric definition now declares what a valid value is:
+
+```yaml
+- name: average_example_metric
+  type: mean
+  unit: percent
+  validRange:
+    min: 0
+    max: 100
+```
+
+All 72 metrics got one. The config validator warns about any metric without a range. It printed 55 warnings before the change and none after.
+
+The range does two jobs. In the computation, it decides which device values are counted. At publication, it decides whether the result is allowed out.
+
+## Where the guard sits
+
+Bounding the inputs handles the failure I knew about. I also wanted a guard against the ones I did not.
+
+The second check sits in the step that copies computed results into the bucket the API serves from. I picked that spot because it is the one place every benchmark passes through before it can reach a customer, and because the API divides value by weight with no check of its own.
+
+When a result is outside its range, or is not a finite number:
+
+- Nothing is written, so the API keeps serving the previous files.
+- That one benchmark ends its run in a "not published" state.
+- The computed table is kept, so the history shows what the value would have been.
+- Every other benchmark in the group publishes normally, and the run as a whole succeeds.
+
+That last point took some thought. A failed run gets attention, and that is tempting. But one corrupt metric should not block seventy good ones, and a pipeline that fails every time a device misbehaves teaches people to ignore its failures.
+
+Withholding has a cost of its own, which I wrote into the monitoring change:
+
+> That makes a Datadog monitor the only signal that a benchmark stopped updating.
+
+A stale benchmark is better than an impossible one only if somebody finds out. So every run sends two metrics, zeros included: the number of out-of-range rows, and the number of large changes. A monitor on the first would have caught the 252%.
+
+The second is a softer check. It logs any headline value that moved more than 50% since the previous publication. It does not block anything. In the words of the monitor text:
+
+> A large move can be real, but it is also how outliers in the input first show up.
+
+It deliberately skips per-dimension rows, because large relative moves are routine in small groups and an alert that fires every night is not an alert.
+
+## What I got wrong along the way
+
+The first fix patched one metric. I should have asked sooner whether the pattern was general, because it was general across most of them.
+
+Two days after the main change merged, I had to follow up with another that moved an expression out of the `HAVING` clauses I had just introduced.
+
+And the pull request for the guard lists one risk I could not close before merging: a possible missing permission that would cause the change check, and only that check, to be skipped silently. A guard that can fail quietly is the exact problem I was fixing, so it is written down where the next person will see it.
+
+## What I took from it
+
+**An average needs a population.** Before asking whether the sum is right, ask who is in the denominator. Devices with no value for a metric are not devices with a value of zero.
+
+**Declare validity next to the definition.** The range lives in the same file as the metric. Whoever adds a metric is asked, by a warning, what values it can take, at the moment they know best.
+
+**Check at the narrowest point.** One guard where everything must pass beats seventy guards in seventy queries.
+
+**Withhold, do not fail, and then alert.** Serve the last good value, keep the bad one for inspection, and make sure the silence is noisy.

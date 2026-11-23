@@ -1,0 +1,127 @@
+---
+title: "One JSON file to onboard a Kafka event"
+description: "Our Kafka-to-data-lake extractor used to need a listener class, a hand-written Avro schema and a test helper for every event type. Now it needs one config entry. How we got there, and the ordering bug that followed."
+date: "2026-11-21"
+kind: "post"
+tags: ["kafka", "avro", "java", "data platform", "refactoring"]
+---
+
+`cloudy-cider` is the service at the very start of our data platform. It reads protobuf events from Kafka in each product cell, keeps the fields we are allowed to keep, hashes the identifiers, and writes Avro files to S3. Everything downstream, the Spark jobs, the benchmarks, the APIs, starts from those files.
+
+My first commit to it, in September 2021, was titled "Extract binary update events". Over the next two years I added a dozen more event types the same way. This post is about making that work unnecessary.
+
+Across 43 merged pull requests I added 13,897 lines to that repository and removed 14,549. I am fonder of the second number.
+
+## What one event used to cost
+
+In 2021, a new event type meant:
+
+- a Kafka listener class of its own, about 67 lines, nearly identical to all the others
+- entries in a constants file and in the application config
+- new blocks in the Helm deployment and Kafka-user templates
+- changes to the CI configuration
+
+Every event was a small feature. None of it was hard, and all of it was the kind of code where the review comment is "you forgot the third place".
+
+## Step one: a single listener
+
+In November 2023 I replaced the per-event listeners with one generic listener. That pull request deleted 17 listener classes, the constants file and a factory, and took the Helm deployment template from 136 lines of repetition to 13.
+
+It added 747 lines and removed 2,163.
+
+After that, onboarding was better and still not good. The playbook we wrote in January 2025 lists the remaining steps:
+
+1. Add an entry to the extraction config, with the fields to select.
+2. Hand-write a matching Avro record in a separate schema file, converting dots to underscores and typing every field.
+3. Write a test helper class that builds an example message.
+4. Mirror the entry in the test config.
+5. Bump the chart and release the service.
+
+Step two is where the bugs lived. The schema file was 4,952 lines of JSON, maintained by hand, that had to agree with the config file field for field.
+
+## Step two: the config is the schema
+
+In March 2026 I made the field list typed, and deleted the schema file.
+
+An entry now looks like this:
+
+```json
+{
+  "name": "ExampleEvent",
+  "version": "v1",
+  "tenantField": "tenant_id",
+  "className": "com.example.protobuf.v1.ExampleEvent",
+  "kafkaTopic": "example_topic",
+  "autoOffsetReset": "latest",
+  "selectFields": {
+    "#timestamp": "int",
+    "tenant_id": "string",
+    "device.id": "string",
+    "payload.duration_ms": ["null", "long"],
+    "payload.codes": { "type": "array", "items": "int" }
+  },
+  "deIdentifyFields": ["device.id"]
+}
+```
+
+A small generator turns `selectFields` into an Avro schema when the service starts. Its rules fit in a paragraph. A string names a primitive type. A list is a union, and a union that starts with `null` gets a null default, which Avro needs for schema evolution. An object is an array or a map. Field names are the path with anything non-alphanumeric replaced by an underscore. A path containing `[]` becomes an array of nested records. Anything it does not recognise stops the service at startup, which is where I want to hear about it.
+
+That pull request added 3,097 lines and removed 7,565. Its description says what it was for:
+
+> This reduces onboarding a new event to editing a single file.
+
+## Step three: one test for every entry
+
+The test helpers went next. Each was a class that built one example message by hand.
+
+They were replaced by a single parameterised test that runs over every entry in the config. For each one it checks that:
+
+- the protobuf class exists
+- every selected path exists in the protobuf descriptor
+- a schema can be generated
+- every transform it names is registered
+- a full round trip works
+
+The round trip is the useful part. The test builds a fully populated protobuf message by reflection, extracts fields with the production code, writes them to the Avro buffer and reads them back.
+
+A wrong path or a wrong type now fails the build without anyone writing a test for it. More than thirty helper classes were deleted, and the few that remain cover end-to-end scenarios.
+
+## Step four: routing from the same file
+
+One duplicate remained. A topic still had to be listed in the application config so that a listener would subscribe to it.
+
+In April 2026 I added a property source loader that runs before the application's defaults, reads the extraction config, and generates the topic lists from it. An entry that reads from the earliest offset goes to one listener, everything else to the other, and a name-to-topic map is built for all of them.
+
+Consumer tuning stays in Helm values on purpose. Which events exist is a data question. How many pods read them is an operations question, and the two change for different reasons.
+
+## What bit us
+
+Thirty-seven days after the schema generator shipped, downstream Spark jobs began failing to read some tables with `CANNOT_RECOGNIZE_HIVE_TYPE`.
+
+The cause was two letters long. The config was parsed into a `HashMap`.
+
+A hash map has no stable order, so two pods, or the same pod after a restart, could generate the same schema with its fields in a different order. That sounds harmless, since both schemas describe the same record. It is not:
+
+> Determinism here is required: each Avro file embeds its writer schema, and the Glue crawler unifies files only when their record types match field-for-field including order.
+
+When the crawler found files whose fields were permuted, it treated them as different record types and declared the column a union of the two. The union became a Hive type that Spark cannot read.
+
+The fix was `LinkedHashMap` and `LinkedHashSet` all the way through, and 104 lines of tests that pin the order.
+
+The hand-written schema file never had this bug. A file has an order. I had replaced a tedious, stable artefact with a convenient, generated one, and had not asked what properties of the old one other systems were relying on. Field order had been part of our contract with the crawler for years. Nobody had written that down because nobody had needed to.
+
+## Where it stands
+
+Today there are 44 event types in the config and no per-event code. Since October 2026 the config file does not even live in the service. It sits in our data governance repository, ships as a ConfigMap, and is reloaded without a restart.
+
+Onboarding an event is one entry in one file, reviewed by the people who own the data.
+
+## What I would repeat
+
+**Delete in stages.** Each step removed one duplicate and shipped alone: the listeners in 2023, the schema file, the test helpers and the routing over a few weeks in 2026. A single pull request doing all four would not have been reviewable.
+
+**Generate from the thing people already edit.** We did not introduce a new schema language. The config already listed the fields, and it only needed their types.
+
+**Fail at startup.** Every rule the generator enforces is checked when the service boots and again in the build. A bad entry cannot reach a running consumer.
+
+**Ask what the old artefact guaranteed by accident.** Before replacing a hand-maintained file with a generated one, list what stays constant in the file simply because it is a file. Then make the generator guarantee the same things.

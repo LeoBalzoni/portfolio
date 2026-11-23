@@ -6,11 +6,10 @@ export const alt = siteConfig.ogImageAlt;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Approximated from --primary oklch(0.45 0.12 155) — the brand green.
-const PRIMARY = "#1f6f4a";
-const BG = "#0c100e";
-const FG = "#f5f7f6";
-const MUTED = "#9aa39e";
+const PAPER = "#f3f4ee";
+const INK = "#1b1c1a";
+const LAKE = "#cde2ef";
+const ROUTE = "#d3301f";
 
 export default function Image() {
   return new ImageResponse(
@@ -19,73 +18,63 @@ export default function Image() {
         style={{
           width: "100%",
           height: "100%",
-          background: `linear-gradient(135deg, ${BG} 0%, #0e1612 100%)`,
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "80px",
-          color: FG,
+          background: PAPER,
+          color: INK,
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            padding: "0 72px",
+          }}
+        >
           <div
             style={{
-              width: "10px",
-              height: "10px",
-              borderRadius: "9999px",
-              background: PRIMARY,
-            }}
-          />
-          <span
-            style={{
-              fontSize: "22px",
-              color: MUTED,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-            }}
-          >
-            leonardo.
-          </span>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-          <div
-            style={{
-              fontSize: "120px",
-              fontWeight: 800,
-              lineHeight: 1,
-              letterSpacing: "-0.03em",
               display: "flex",
               flexDirection: "column",
+              fontSize: 150,
+              fontWeight: 800,
+              lineHeight: 0.92,
+              letterSpacing: "-0.04em",
             }}
           >
             <span>Leonardo</span>
-            <span
-              style={{
-                background: `linear-gradient(135deg, ${FG} 0%, ${PRIMARY} 100%)`,
-                backgroundClip: "text",
-                color: "transparent",
-              }}
-            >
-              Balzoni
-            </span>
+            <span>Balzoni</span>
           </div>
-          <div style={{ fontSize: "32px", color: MUTED, maxWidth: "900px" }}>
-            {siteConfig.description}
+          <div style={{ display: "flex", alignItems: "center", marginTop: 36, fontSize: 34 }}>
+            <div
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 30,
+                border: `8px solid ${ROUTE}`,
+                background: "#fff",
+                marginRight: 20,
+              }}
+            />
+            Software engineer in Lausanne. Writing and work, drawn as a map.
           </div>
         </div>
-
         <div
           style={{
+            height: 150,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            fontSize: "22px",
-            color: MUTED,
+            padding: "0 72px",
+            background: LAKE,
+            borderTop: "3px solid #3f7fa8",
+            color: "#1c577c",
+            fontSize: 26,
           }}
         >
-          <span>Software Engineer</span>
+          <span style={{ letterSpacing: "0.5em", fontStyle: "italic" }}>LAC LÉMAN</span>
           <span>{siteConfig.url.replace(/^https?:\/\//, "")}</span>
         </div>
       </div>

@@ -1,0 +1,80 @@
+---
+title: "Two builds, one chunk registry"
+description: "A micro-frontend that rendered the previous page under the new URL, an eight-line fix, and what it taught me about shipping the same app as two webpack builds."
+date: "2026-11-21"
+kind: "post"
+tags: ["frontend", "webpack", "micro-frontends", "debugging"]
+---
+
+I made the first commit to `diagnostics.cade-ui` on 5 January 2021. It is the interface for Nexthink's diagnostics dashboards: an IT admin opens an issue such as an application crash or a slow web app, and sees a timeline, the affected devices, ranked probable causes, and how they compare with other companies.
+
+Nearly six years and 497 of my commits later, one of the stranger bugs in that repository was fixed with eight lines of configuration.
+
+## The symptom
+
+Open an AppEx dashboard on its benchmark tab. From there, navigate to a diagnostics page. The URL changes. The dashboard you just left stays on screen. Refresh, and the right page appears.
+
+Each of the two pages worked perfectly on its own.
+
+## Why there are two builds
+
+The app ships as two webpack builds of the same source.
+
+The older one is a UMD bundle, `cadeUi.js`. The product shell injects it as a script and reads a global that the script assigns.
+
+The newer one is a Module Federation remote. It exposes a few components, such as the web-app profiling view and the functional errors dashboard, so other products can embed them. The benchmark tab inside AppEx is one of those embedded components.
+
+So a user who visits AppEx and then diagnostics ends up with both builds loaded in one page.
+
+## The mechanism
+
+Webpack keeps a registry of loaded chunks in a global array. The array's name is derived from `output.uniqueName`, and if you do not set that, it defaults to the name in `package.json`.
+
+Neither of our configs set it. Both builds therefore used the same global, `webpackChunkcade_ui`.
+
+When the federated remote loaded first, for the benchmark tab, it installed its chunks into that array. Then the shell injected `cadeUi.js`, which looked up its own chunk ids in the same array, found another build's chunks under them, and threw inside `__webpack_require__`.
+
+That alone would have produced a blank page and an obvious error. The stale page came from one more step, which I described in the pull request like this:
+
+> The script still fired onload, so the shell resolved window.default, which no longer had been reassigned and still held the previous micro frontend, and rendered that instead.
+
+A script that throws while executing has still loaded, as far as the browser is concerned. The shell saw `onload`, read the global, and found the last app that had successfully assigned itself there. It rendered that app, correctly, under the wrong URL.
+
+## The fix
+
+```js
+// Unnamed builds key their chunk registry on the package name, which this one and
+// the federated one (webpack.federation.mjs) would share: on a page holding both,
+// cadeUi.js resolves its chunk ids against the remote's chunks and throws.
+const UMD_UNIQUE_NAME = "cadeUiUmd";
+
+// ...
+output: {
+  libraryTarget: "umd",
+  // keeps this build's chunk registry separate from the federated
+  // one when both are loaded on the same page
+  uniqueName: UMD_UNIQUE_NAME,
+},
+```
+
+One name, and the two registries stay apart.
+
+## What I took from it
+
+**Two builds of one package are two applications.** Webpack's defaults assume one build per package name. The moment you add a second config, every default derived from the package name is a shared global waiting for the right page order.
+
+**`onload` means loaded, not worked.** The loader contract between our shell and its micro-frontends was "inject the script, wait for `onload`, read the global". That contract cannot tell a successful load from a failed one that left an old value behind. The eight lines fixed our collision. The contract is the real weakness, and the newer federation path does not have it.
+
+**Order-dependent bugs hide in integration.** Each repository's tests passed, because each build is correct alone. The failure needed a host from one team, a remote from ours, and a user who clicked in a particular order. I do not have a clever answer for this beyond the unglamorous one: when you embed something in another product, go and click around that product.
+
+## The same shape, a few months earlier
+
+This was the second startup-ordering bug in that codebase in one year.
+
+In the spring, pages were intermittently failing on first load with authorization errors. The cause was that the shell's `getToken()` returns null while authentication is still initialising, and our GraphQL client treated null as "no token, send the request anyway".
+
+My first fix made the client throw and retry a few times. It was not enough, and three weeks later I replaced it with a simpler rule: nothing is sent until a token exists. A small `waitForToken` helper polls for up to two seconds, the GraphQL provider is not mounted until it resolves, and a failure renders a proper error page instead of a broken dashboard.
+
+The comment I left in that helper is the whole lesson: null is "the intentional 'not ready yet' sentinel, not an auth failure".
+
+Both bugs came from the same place. An embedded app does not control when it starts or what is already on the page. Anything it assumes about either should be written down as code.

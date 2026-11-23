@@ -1,91 +1,53 @@
 # Portfolio
 
-Personal portfolio site — homepage with a 3D hero scene, project showcase, and an MDX-powered blog. Built as a static export and deployed to GitHub Pages.
+Leonardo Balzoni's personal site: writing, work notes and side projects, drawn as one sheet of a topographic map. Built as a static export and deployed to GitHub Pages on every push to `main`.
 
-## Tech stack
+## Stack
 
-**Framework & language**
-- [Next.js 16](https://nextjs.org) (App Router, static export via `output: "export"`)
-- [React 19](https://react.dev)
-- [TypeScript 5](https://www.typescriptlang.org)
+- [Next.js 16](https://nextjs.org) (App Router, `output: "export"`), React 19, TypeScript
+- Plain CSS in `src/app/globals.css`; fonts (Archivo, Literata, JetBrains Mono) self-hosted through `next/font`
+- MDX posts rendered with `next-mdx-remote`, with `remark-gfm` for tables
+- No client-side libraries beyond React; the map is static SVG and CSS
 
-**Styling & UI**
-- [Tailwind CSS 4](https://tailwindcss.com) with `@tailwindcss/typography` and `tw-animate-css`
-- [shadcn/ui](https://ui.shadcn.com) primitives (Button, Card, Badge, Separator) built on [Base UI](https://base-ui.com)
-- [next-themes](https://github.com/pacocoursey/next-themes) for light/dark mode
-- [lucide-react](https://lucide.dev) icons
-- `class-variance-authority`, `clsx`, `tailwind-merge` for variant/className composition
-
-**3D & motion**
-- [three.js](https://threejs.org) with [@react-three/fiber](https://r3f.docs.pmnd.rs) and [@react-three/drei](https://drei.docs.pmnd.rs) for the hero scene
-- [framer-motion](https://www.framer.com/motion/) for UI animations
-
-**Content**
-- [next-mdx-remote](https://github.com/hashicorp/next-mdx-remote) for MDX blog posts
-- [gray-matter](https://github.com/jonschlinkert/gray-matter) for frontmatter parsing
-- [reading-time](https://github.com/ngryman/reading-time) for post read-time estimates
-
-**Tooling**
-- ESLint 9 (`eslint-config-next`)
-- PostCSS (`@tailwindcss/postcss`)
-
-## Project structure
+## Layout
 
 ```
-portfolio/
-├── content/
-│   └── blog/                 # MDX blog posts (frontmatter + body)
-├── public/
-│   ├── models/               # GLTF/3D assets for the hero scene
-│   └── *.svg                 # Static icons
-├── specs/                    # Design / spec documents
-├── src/
-│   ├── app/                  # Next.js App Router routes
-│   │   ├── layout.tsx        # Root layout (theme provider, nav, footer)
-│   │   ├── page.tsx          # Homepage with hero scene
-│   │   ├── globals.css       # Tailwind entry + global styles
-│   │   ├── opengraph-image.tsx
-│   │   ├── robots.ts
-│   │   ├── sitemap.ts
-│   │   ├── blog/
-│   │   │   ├── page.tsx      # Blog index
-│   │   │   └── [slug]/       # Individual post pages
-│   │   └── projects/
-│   │       └── page.tsx      # Projects listing
-│   ├── components/
-│   │   ├── hero-scene.tsx    # react-three-fiber scene
-│   │   ├── hero-scene-loader.tsx
-│   │   ├── nav.tsx, footer.tsx
-│   │   ├── theme-provider.tsx, theme-toggle.tsx
-│   │   ├── motion.tsx, icons.tsx
-│   │   └── ui/               # shadcn primitives
-│   ├── data/
-│   │   └── projects.ts       # Project entries shown on /projects
-│   └── lib/
-│       ├── blog.ts           # MDX loading + frontmatter helpers
-│       ├── site.ts           # Site metadata
-│       └── utils.ts          # `cn()` and shared helpers
-├── next.config.ts            # Static export + GitHub Pages basePath
-├── components.json           # shadcn config
-└── tsconfig.json
+content/blog/            MDX posts (frontmatter + body)
+scripts/
+  generate-terrain.mjs   Generates the map artwork and route geometry
+public/
+  map/                   Generated: sheet-wide.svg, sheet-tall.svg
+  games/                 Screenshots used in the games section and post
+src/
+  app/                   Routes: / , /blog/ , /blog/[slug]/ , /work/
+  components/            map-sheet, profile, post-list, site-nav, site-footer, mdx
+  data/
+    sheet.ts             Which posts sit on the map, and their short names
+    work.ts              Repositories, merged-PR counts and what was done in each
+    terrain.json         Generated: route, waypoint and label positions
+  lib/                   blog.ts (post loading), site.ts (identity, base path)
+PRODUCT.md               Product brief
+DESIGN.md                Design system
 ```
 
-## Getting started
+## Common tasks
 
 ```bash
-npm install
-npm run dev
+npm run dev      # http://localhost:3000
+npm run build    # static export to out/
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+**Add a post.** Create `content/blog/<slug>.mdx` with `title`, `description`, `date`, `kind` (`post`, `talk` or `games`) and `tags`. To control its place in the index, add the slug to `ORDER` in `src/lib/blog.ts`. To put it on the map, add it to `route` or `villages` in `src/data/sheet.ts`.
 
-### Scripts
+**Link the talk recording.** Set `video` in the frontmatter of `content/blog/how-to-survive-the-ai-era.mdx`.
 
-- `npm run dev` — start the dev server
-- `npm run build` — produce a static export in `out/`
-- `npm run start` — serve the production build
-- `npm run lint` — run ESLint
+**Images in posts.** Put files under `public/` and use `<Figure src="/games/file.jpg" alt="..." caption="..." />`. The component adds the deployment base path.
+
+**Change the map.** Edit the sheet definitions at the top of `scripts/generate-terrain.mjs` (shoreline, peaks, route points, label positions), then run `node scripts/generate-terrain.mjs` and commit the regenerated files. The terrain is synthetic and seeded, so the output is reproducible.
+
+**Update the work numbers.** Edit `src/data/work.ts`. The profile chart and totals are computed from it.
 
 ## Deployment
 
-The site is configured for static export (`output: "export"` in `next.config.ts`) and uses a `/portfolio` `basePath` in production for GitHub Pages. The built site lands in `out/`.
+`.github/workflows/deploy.yml` builds and publishes `out/` to GitHub Pages. The site is served under `/portfolio`, which `src/lib/site.ts` applies as the base path in production builds.
