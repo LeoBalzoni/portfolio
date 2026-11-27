@@ -1,0 +1,184 @@
+---
+title: "A sales cockpit for a shared screen"
+description: "Three days of a company innovathon, building the interface of a forecast and deal-risk cockpit that a sales leader shares in the weekly sync. What the room taught the design, how the risk model underneath was graded, what real data broke, and how we reached the top 5 of 40 teams."
+date: "2026-11-27"
+kind: "post"
+tags: ["innovathon", "design systems", "data visualization", "next.js", "claude code"]
+---
+
+Once a week, a sales leader shares their screen and walks the quarter with their reps. Will we hit the number? Which large deals are in trouble, why, and what do we do about them? Today that conversation runs on Salesforce reports and opinion.
+
+For this year's Nexthink innovathon, six of us built the screen that conversation could run on instead. We called it the Sales Cockpit, and by the final it was called GTM Workplace. There were 40 teams. We made the final 12, then finished in the top 5.
+
+My part was the interface. Two teammates built the risk model that scores every open deal for loss and slip. Another built the agents that check each flagged deal against its records and write the evidence, plus the chat server. Another owned the infrastructure, and a colleague wrote the requirements. This post is about the interface, told mostly from its pull requests.
+
+## The constraint was the room
+
+Most dashboards are designed for one person at a desk. This one would be shared on a projector or a Teams call at 1920×1080, read by several people at once while someone talks. That changed almost every decision.
+
+The text base is 16px, not the 12px of our product's design system. The layout must not move while the leader clicks: filtering or selecting never shifts the bars or the header, only the table content. Every state is shown twice, with a label and a shape, never a colour alone, because someone in the room may be colour-blind and will not say so. Every screen starts with the whole quarter, then focuses on one deal.
+
+I wrote these down before any layout existed, in a product file the design tooling reads on every change. They paid off more than any single component.
+
+## Foundations: Apollo, shadcn and a contract
+
+The cockpit is built on Apollo, Nexthink's design tokens, mapped onto shadcn/ui. The tokens come from a package, and a script turns them into CSS variables. The first build broke silently: one token name contained a `+`, the CSS compiler dropped every token after it, and half the theme disappeared without an error. The fix was to sanitize the names. The real lesson was to add a check that counts the Apollo tokens in the final CSS bundle and fails the build when one is missing. It never fired again, and I never had to wonder.
+
+The second foundation was a typed API contract served from fictional fixtures. The interface was not going to wait for the model or the forecast SQL, and each endpoint could switch to real data on its own. Fifty made-up deals, ten with full signals, covering every kind of evidence the model might cite, plus one deal with no evidence at all, because "Unknown" is a valid answer and it has to look like one.
+
+That paid off on the second day, in a way I had not planned. A teammate connected the forecast to the data lake, and the Deal signals page went empty. The fixture deal ids did not exist in Salesforce, so the page joined real deals to fake signals and found none. One environment variable that serves every view from fixtures got us building again in minutes.
+
+## Forecast: the bars are the filter
+
+<Figure
+  src="/blog/sales-cockpit/forecast.jpg"
+  alt="The Forecast page on sample data: a bar for New business and one for Renewal, split into Closed, Commit, Best Case and Pipeline with the amounts inside, a quota line, and under each bar the money at loss risk in amber and red. The deal table follows."
+  caption="The Forecast page, on sample data. Clicking any segment, or any red or amber part, filters the table below."
+  width="1920"
+  height="1080"
+/>
+
+The Forecast page answers "will we hit the number?" with one bar per motion, new business and renewal. Closed, Commit, Best Case and Pipeline are stacked against a quota line, with the amounts written inside the segments so the room reads them without a legend.
+
+I tried a few layouts on a decision page with real-shaped data: a headline sentence per motion, a dense grid, plain bars. The version I steered towards took the bars from one and the grid's numbers from another, and dropped the sentences. Then the segments became clickable: click Commit and the deal table below shows exactly the Commit deals, and the counts add up to the segment.
+
+The colours went through the dataviz palette validator rather than my eyes. The certainty ramp is one blue, darkest for Closed. A fourth light blue for Pipeline was indistinguishable from Best Case, at a ΔE of 4, so Pipeline became a dashed outline instead. It is not forecast money yet, and now it looks like it.
+
+## Deal signals: one screen, walked with the arrows
+
+<Figure
+  src="/blog/sales-cockpit/signals.jpg"
+  alt="The Deal signals page on sample data: a list of ten flagged deals with Loss and Slip risk badges on the left, and the open deal's panel on the right with the close date and ACV beside the arrows, recommended actions, loss and slip risk with their reasons folded, and MEDDPICC."
+  caption="Deal signals, on sample data. The list keeps the room's place; the panel holds one deal."
+  width="1920"
+  height="1080"
+/>
+
+The second page lists the deals the model flagged and shows one in depth. I tried an overlay drawer, a split view and a docked panel. The docked panel won because the room keeps its place in the list while one deal is discussed: press ↓, the next deal replaces the panel, the highlight moves one row down, and nothing else on screen moves.
+
+The first version stepped with `j` and `k`, and jumped between sections with letter keys. The arrows matched a vertical list better, so they replaced `j` and `k`. Then a review comment pointed at WCAG 2.1.4 for the letter keys: single-character shortcuts fire by accident for anyone using speech input, and they cannot be turned off. The walk is the arrow keys and Esc, nothing else.
+
+Each deal shows its loss and slip risk, the reasons behind each, the cited evidence (a CRM field change, a call excerpt with its timestamp, an email, a usage metric), MEDDPICC, and the recommended actions. A risk is only shown with evidence. An inference is labelled as one.
+
+## Under the screen: where the numbers come from
+
+The interface was my part, but it is only as good as what it shows, and most of the hard work was underneath. Teammates built all of it. Here is the short version, because it shaped what the screen could honestly say.
+
+### The forecast, from the data lake
+
+The bars are not a sum of opportunity amounts. They follow the rules the company's forecasting already uses: the unit is the deal split, not the deal; new business and renewals are counted from different split types; a renewal lands in the quarter of its renewal target date; management adjustments replace the system amounts where a manager has overridden them; and everything is converted to dollars at the rate of the close date. One query per view against the lake's latest Salesforce snapshot, with its results reused across views so a page stays under the 29-second gateway limit with room to spare.
+
+The deal table underneath is built from the same splits, one row per deal, split type and category, so the rows of a segment add up to the segment. That is what makes clicking a segment trustworthy.
+
+### The risk model: a time machine for the CRM
+
+Two teammates built the model that scores every open deal for **slip** (closes after this quarter) and **loss**. Their own one-line summary is the best one: they built a time machine for the CRM.
+
+For every month since January 2024, a SQL query rebuilds what each open deal looked like on the 1st of that month, using only records dated before it: close-date pushes, stage and forecast changes, amount and owner edits, days in stage, and for renewals, product usage. One deal appears once per month it was open, so each row asks a different question: on this day, with this much of the quarter left, will this deal close this quarter?
+
+The models are XGBoost with shallow trees and fixed settings, four of them: new business and renewal, slip and loss. Around forty numbers per deal and day go in. A probability comes out, and SHAP values explain which inputs pushed it up.
+
+**The exam is out of time.** Train on every quarter before a test quarter, grade on that quarter, move forward one, seven times. Labels become known on fixed dates, the quarter end for slip and 45 days later for loss, so no training row knows something its test quarter does not. Error bars come from resampling whole deals, never single rows, because the monthly photos of one deal are not independent.
+
+**The sanity checks found things.** With the labels shuffled, the AUC drops to chance, as it should. No model scores suspiciously well. And one leak was caught: a "date the deal reached this stage" field is overwritten when a deal re-enters the stage, so it quietly carried the future. It was worth a few hundredths of AUC, which is exactly the size of leak that survives if nobody looks.
+
+**A data trap, too.** In mid-2026, emails started being logged against the account instead of the deal. A model reading only deal emails would have concluded that every live customer had gone silent. It now reads both.
+
+**The results, against the reps' own forecast category** on quarters the model never saw:
+
+- **Renewal slip** is where it shines. The reps' call is a coin toss there, an AUC of 0.51. The model reaches 0.70.
+- **Renewal churn** is very predictable: the 20% of renewals the model flags hold about two thirds of the renewal value that was later lost.
+- **New business slip** improves from 0.65 to 0.73.
+- **New business loss** is on par with the reps, and the difference is not significant. The team showed that honestly rather than hiding it.
+
+The popular rule of thumb ("five or more pushes, no procurement words, 45 days of silence") collapses to a coin toss when measured only on what was known at the time. Its famous hit rate had counted things that happened later.
+
+What the model weighs is mostly the obvious, measured properly: the forecast category, days in the current stage, days left, deal size, and a close date parked on the last day of the quarter, which is often a placeholder rather than a promise. Product usage only earned its place for renewal churn: renewals whose active users fell sharply were lost far more often.
+
+Two choices from that work went straight into the interface. Risk levels are **relative to deals at the same point of the quarter**, because risk naturally falls as the quarter runs out: High is the riskiest fifth, not a fixed probability. And the model only gives **leads**, not findings.
+
+### One agent per flagged deal
+
+The model is tuned for recall: it flags many deals so that few are missed, and many of its reasons are weak on their own. So a teammate put a Claude agent behind each flagged deal. It reads the deal's real records through the data platform's MCP server (the opportunity and its next steps, the field history, emails, calls, product usage, public news about the account), checks the model's reasons against them, keeps only those the records back, and adds what the model missed.
+
+The agent writes for a sales manager, not a data scientist. Its brief says it plainly: never mention a model, a probability or a field name, and "one wrong fact discredits the whole panel". The build script enforces it, sending any output that mentions SHAP, a percentile or a Salesforce field name back to the same session to be rewritten. Every reason carries its evidence, every inference is marked as one, and the reasons get a category (pricing, product, security, competition, legal, a key person leaving, the company itself), which is where the tags on the panel come from.
+
+That split of work is why the Deal signals page can say "a competitor was mentioned on the last two calls" with the excerpt underneath, instead of "feature 17 is high".
+
+## The plan changed, and the actions got better
+
+The original plan had an approval flow: approve, edit or dismiss each recommended action, then send a Teams card through a webhook, with a history of original versus edited. I had specced the endpoints, the idempotency rules and the storage.
+
+On the second day the team changed direction, and it was the right call. The cockpit sends nothing. It hands off:
+
+<Figure
+  src="/blog/sales-cockpit/teams-preview.jpg"
+  alt="The Teams preview popover: Message to Elena Marsh, the full prewritten message, and an Open in Teams button with the note that it opens unsent."
+  caption="The room sees the exact message and recipient before Teams opens with it, unsent."
+  width="1132"
+  height="640"
+/>
+
+- **Message the owner on Teams.** A popover shows the recipient and the exact message, written by the enrichment agent for that deal. "Open in Teams" opens a chat with the message in the compose box. The leader presses send, in Teams, as themselves.
+- **Discuss in Claude.** A deep link opens Claude Desktop with the deal in the first message. The first version packed the risks, the evidence and the actions into a prompt of up to 12,000 characters. Once the chat could reach the data through our MCP server, it shrank to one line: discuss this opportunity, here is its id, fetch the details.
+- **Dismiss**, with a reason: already done, not relevant, disagree with the risk, deal changed. Dismissing folds the actions behind one line, with who, when, why and an Undo. Later, each action got its own ✕ too.
+
+No webhook to provision, no consent to request, and no message ever sent on someone's behalf. The principle "nothing leaves without a previewed confirmation" survived the change, because the preview is the confirmation.
+
+## Real data broke the design, usefully
+
+Fixtures are polite. On day two the real snapshot arrived, and the first look was humbling. Driver titles were full sentences, actions ran to three lines, and MEDDPICC was mostly weak, everywhere. The changes that followed were all subtractions:
+
+- **MEDDPICC moved to the bottom.** It is still there, but it supports the risks instead of leading.
+- **Everything verbose folded.** Reasons and actions became disclosure rows: the headline shows, the evidence or the why opens on click, and everything closes again on the next deal.
+- **Severity badges became weight.** Each driver had its own High, Medium or Low badge, right next to the Loss risk badge, which also says High. The room could not tell a high driver from a high risk. Drivers now show a neutral Major, Moderate or Minor with three grey pills, and colour is kept for the risk levels.
+- **A clever idea died on real data.** Under the forecast bars I added the money at loss risk, split into one piece per deal so the room could see whether the exposure was one deal or many. With dozens of deals per part, the pieces turned into stripes and the amounts became unreadable. They are solid totals now.
+
+<Figure
+  src="/blog/sales-cockpit/signals-rail-dark.jpg"
+  alt="Deal signals in dark mode with the deal list folded to a narrow rail of ranks and small Loss and Slip squares, and the panel showing a loss risk's reasons opened, one of them expanded to two call excerpts."
+  caption="The list folds to a rail of ranks and risk marks, so the deal takes the width. Reasons open on demand, evidence one level deeper."
+  width="1920"
+  height="1080"
+/>
+
+The semifinal jury added their own round. The money at risk should sit at the end of each segment, so it reads as the last part of the money. Small segments' labels should go above the bar rather than leave a gap below it. The list should fold away so the deal gets the width. And each reason should say what it is about, so reasons got small tags, one hue per category, from Apollo's categorical palette. No eight hues pass an all-pairs colour separation check, but every tag says its name, so the hue only speeds up scanning. The most common category, Other, is left out of the summary: it says nothing at a glance.
+
+## How it was built
+
+I built the interface with Claude Code, and I want to be precise about what that meant. I set the direction, steered every layout, decided what to keep and what to cut, and checked every change on screen before it was committed. Claude wrote most of the code, ran the checks, and took the screenshots I reviewed. For design, it used a plugin called Impeccable: decision pages with sketches I could steer with notes, a mechanical detector for common UI mistakes, and a separate reviewer agent that audited each finished feature against the brief before it shipped.
+
+Over three days that came to 13 of the team's 32 merged pull requests. Most of them were small, because a change you can review on a shared screen in a minute is one you can still revert before the demo.
+
+Copilot reviewed the pull requests, and it caught real bugs, not style nits:
+
+- a filter matched by position, which broke as soon as the chat wrote a view with the filters in another order;
+- a Claude link that crashed the whole panel when a long prompt was cut in the middle of an emoji;
+- a toggle that dropped keyboard focus to the page because the header was remounted;
+- padding that floored a 3px risk part at 16px and pushed it into its neighbour.
+
+Each of those passed every check I had, including the screenshots.
+
+## What I got wrong
+
+**I built the approval flow before the team agreed on it.** The endpoints and their idempotency rules were specced, half-built and then dropped within a day. Asking "is this still the plan?" each morning would have saved that time.
+
+**I trusted a script edit that failed silently.** One replacement in a multi-step edit did not match, and the change that was meant to reset the panel's state on every deal never landed. My test passed anyway, because the fixtures never reused a driver id. Real deals did. Copilot found it. Since then every scripted edit asserts that it matched.
+
+**I designed for fixtures too long.** Polite data hides the problems that matter on a shared screen: long titles, many small deals, a segment that is almost all at risk. A day earlier with a real snapshot, even locally, would have saved two rounds of rework.
+
+**One bug nearly reached the first demo.** With the panel scrolled, a dismiss ✕ was drawn on top of the sticky deal header. I only found it by rendering real data an hour before, and the fix was one z-index. A layout is only checked on the data it will actually show.
+
+## What I took from it
+
+**Design for the place the screen is used.** A screen shown to a room has different rules from one read at a desk: bigger type, a layout that stays put, nothing in colour alone. Write them down first. They answer most later questions.
+
+**Put a contract and fixtures between the interface and the data.** The interface never waited, and when real data broke a page, one switch brought it back.
+
+**Compute what can be computed.** Colour separation, contrast, every token reaching the bundle: checked by scripts, not by eye.
+
+**Real data edits the design, mostly by subtraction.** The best changes on day two removed something: a badge, a column of text, a clever split.
+
+**Hand off instead of acting.** The cockpit sends nothing on anyone's behalf. It prepares, shows, and lets the person act in the tool they already trust.
+
+The walk we designed for fits in a minute. Open the quarter, click the red part of Commit, step through the deals behind it with the arrows, and open Teams with the message to the first owner already written. It took us to the top 5 of 40.

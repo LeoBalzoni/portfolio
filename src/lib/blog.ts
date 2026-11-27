@@ -24,6 +24,7 @@ export interface BlogPost {
 
 // Reading order for the index. Posts not listed here follow, newest first.
 const ORDER = [
+  "a-sales-cockpit-for-a-shared-screen",
   "how-to-survive-the-ai-era",
   "the-benchmark-that-said-252-percent",
   "leaving-the-deploy-monolith-for-flux",
